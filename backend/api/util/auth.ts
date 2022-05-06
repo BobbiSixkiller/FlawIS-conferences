@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import { verify, sign, SignOptions } from "jsonwebtoken";
-import { ObjectId } from "mongodb";
 
 import env from "dotenv";
 import { AuthChecker } from "type-graphql";
-import { User } from "../entitites/User";
+import { User } from "./types";
 
 env.config();
+
+
 
 export interface Context {
 	req: Request;

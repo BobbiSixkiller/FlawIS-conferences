@@ -1,23 +1,23 @@
 import "reflect-metadata";
 import Container from "typedi";
-import { ApolloServer } from "apollo-server-express";
+import { ApolloServer } from "apollo-server";
 //import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { connect } from "mongoose";
 
 import { ObjectId } from "mongodb";
 import { ObjectIdScalar } from "./util/scalars";
 import { TypegooseMiddleware } from "./util/typegoose-middleware";
-//import { ApolloComplexityPlugin } from "./util/ApolloComplexityPlugin";
 
-import { UserResolver } from "./resolvers/user";
+import { ConferenceResolver } from "./resolvers/conference";
 
-import { User } from "./entitites/User";
-// import { resolveUserReference } from "./resolvers/resolveUserReference";
 import { buildFederatedSchema } from "./util/buildFederatedSchema";
 
 import env from "dotenv";
 import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
+import { AttendeeResolver } from "./resolvers/attendee";
+import { User } from "./entitites/Attendee";
+import { Conference } from "./entitites/Conference";
 
 env.config();
 
@@ -25,8 +25,8 @@ async function main() {
 	//Build schema
 	const schema = await buildFederatedSchema(
 		{
-			resolvers: [UserResolver],
-			orphanedTypes: [User],
+			resolvers: [ConferenceResolver, AttendeeResolver],
+			orphanedTypes: [Conference, User],
 			// use document converting middleware
 			globalMiddlewares: [TypegooseMiddleware],
 			// use ObjectId scalar mapping
@@ -37,9 +37,6 @@ async function main() {
 			//validate: false,
 			authChecker,
 		}
-		// {
-		// 	User: { __resolveReference: resolveUserReference },
-		// }
 	);
 
 	//Create Apollo server
