@@ -5,6 +5,10 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import {ObjectId} from 'mongodb'
 import { Directive } from "type-graphql";
 
+class Host extends TimeStamps {}
+
+class Section extends TimeStamps {}
+
 @ObjectType({ description: "Conference model type" })
 @Directive('@key(fields: "id")')
 export class Conference extends TimeStamps {

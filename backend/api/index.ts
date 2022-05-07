@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import Container from "typedi";
 import { ApolloServer } from "apollo-server";
-//import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { connect } from "mongoose";
 
 import { ObjectId } from "mongodb";
@@ -16,8 +15,6 @@ import env from "dotenv";
 import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
 import { AttendeeResolver } from "./resolvers/attendee";
-import { User } from "./entitites/Attendee";
-import { Conference } from "./entitites/Conference";
 
 env.config();
 
@@ -26,7 +23,6 @@ async function main() {
 	const schema = await buildFederatedSchema(
 		{
 			resolvers: [ConferenceResolver, AttendeeResolver],
-			orphanedTypes: [Conference, User],
 			// use document converting middleware
 			globalMiddlewares: [TypegooseMiddleware],
 			// use ObjectId scalar mapping

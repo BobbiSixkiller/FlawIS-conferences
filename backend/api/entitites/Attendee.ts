@@ -2,8 +2,12 @@ import { prop as Property} from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
 import { Directive, Field, ID, ObjectType } from "type-graphql";
+
 import { Ref } from "../util/types";
+
 import { Conference } from "./Conference";
+import { Invoice } from "./Invoice";
+import { Submission } from "./Submission";
 
 @Directive("@extends")
 @Directive(`@key(fields: "id")`)
@@ -11,10 +15,10 @@ import { Conference } from "./Conference";
 export class User {
     @Directive("@external")
     @Field(()=>ID)
+    @Property()
     id: ObjectId
 }
 
-@Directive(`@key(fields: "id")`)
 @ObjectType({description: "Attendee model type"})
 export class Attendee extends TimeStamps {
     @Field(()=> ID)
@@ -25,8 +29,20 @@ export class Attendee extends TimeStamps {
     conference: Ref<Conference>
 
     @Field(() => User)
-    @Property({ref:()=> User})
-    user: Ref<User>
+    @Property({type: User, _id: false})
+    user: User
+
+    @Field(() => Invoice)
+    @Property({ref: () => Invoice})
+    invoice: Ref<Invoice>
+
+    @Field(()=> Boolean)
+    @Property({default: false})
+    withSubmission: boolean
+
+    @Field(() => [Submission], {nullable: true})
+    @Property({ref: () => Submission})
+    submissions: Ref<Submission>[]
 
     @Field()
     createdAt: Date

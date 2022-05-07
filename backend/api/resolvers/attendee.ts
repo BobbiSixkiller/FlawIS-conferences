@@ -11,7 +11,6 @@ import { Context } from "../util/auth";
 export class AttendeeResolver {
     constructor(private readonly attendeeService = new CRUDservice(Attendee),private readonly conferenceService= new CRUDservice(Conference)) {}
 
-
     @Query(() => [Attendee])
     async attendees(): Promise<Attendee[]> {
         return await this.attendeeService.findAll({})
@@ -19,7 +18,8 @@ export class AttendeeResolver {
 
     @Mutation(() => Attendee)
     async addAttendee(@Arg("conferenceId")conferenceId: ObjectId, @Ctx() {user}:Context): Promise<Attendee> {
-            return await this.attendeeService.create({conference: conferenceId, user: user?.id})
+        console.log(user?.id)
+            return await this.attendeeService.create({conference: conferenceId, user: {id:user?.id}})
     }
 
     @FieldResolver(() => Conference, {nullable: true})
