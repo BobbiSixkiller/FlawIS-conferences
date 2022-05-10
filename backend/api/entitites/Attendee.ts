@@ -1,4 +1,4 @@
-import { prop as Property} from "@typegoose/typegoose";
+import { Prop, prop as Property} from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
 import { Directive, Field, ID, ObjectType } from "type-graphql";
@@ -17,6 +17,10 @@ export class User {
     @Field(()=>ID)
     @Property()
     id: ObjectId
+
+    @Field()
+    @Prop()
+    name: string
 }
 
 @ObjectType({description: "Attendee model type"})
