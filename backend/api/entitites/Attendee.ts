@@ -1,4 +1,4 @@
-import { Prop, prop as Property} from "@typegoose/typegoose";
+import {  prop as Property} from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
 import { Directive, Field, ID, ObjectType } from "type-graphql";
@@ -19,7 +19,7 @@ export class User {
     id: ObjectId
 
     @Field()
-    @Prop()
+    @Property()
     name: string
 }
 
@@ -46,7 +46,7 @@ export class Attendee extends TimeStamps {
 
     @Field(() => [Submission], {nullable: true})
     @Property({ref: () => Submission})
-    submissions: Ref<Submission>[]
+    submissions?: Ref<Submission>[]
 
     @Field()
     createdAt: Date
