@@ -20,20 +20,18 @@ env.config();
 
 async function main() {
 	//Build schema
-	const schema = await buildFederatedSchema(
-		{
-			resolvers: [ConferenceResolver, AttendeeResolver],
-			// use document converting middleware
-			globalMiddlewares: [TypegooseMiddleware],
-			// use ObjectId scalar mapping
-			scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
-			emitSchemaFile: true,
-			container: Container,
-			//disabled validation for dev purposes
-			//validate: false,
-			authChecker,
-		}
-	);
+	const schema = await buildFederatedSchema({
+		resolvers: [ConferenceResolver, AttendeeResolver],
+		// use document converting middleware
+		globalMiddlewares: [TypegooseMiddleware],
+		// use ObjectId scalar mapping
+		scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
+		emitSchemaFile: true,
+		container: Container,
+		//disabled validation for dev purposes
+		//validate: false,
+		authChecker,
+	});
 
 	//Create Apollo server
 	const server = new ApolloServer({
@@ -51,10 +49,10 @@ async function main() {
 	);
 	console.log(mongoose.connection && "Database connected!");
 
-	await server.listen({ port: process.env.PORT || 5001 }, () =>
+	await server.listen({ port: process.env.PORT || 5003 }, () =>
 		console.log(
 			`🚀 Server ready and listening at ==> http://localhost:${
-				process.env.PORT || 5001
+				process.env.PORT || 5003
 			}${server.graphqlPath}`
 		)
 	);

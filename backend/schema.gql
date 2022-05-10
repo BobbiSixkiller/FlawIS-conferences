@@ -18,8 +18,11 @@ type Attendee {
   conference: Conference!
   createdAt: DateTime!
   id: ID!
+  invoice: Invoice!
+  submissions: [Submission!]
   updatedAt: DateTime!
   user: User!
+  withSubmission: Boolean!
 }
 
 """Conference model type"""
@@ -35,6 +38,11 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
+"""Invoice entity model type"""
+type Invoice {
+  id: ID!
+}
+
 type Mutation {
   addAttendee(conferenceId: ObjectId!): Attendee!
   createConference: Conference!
@@ -48,7 +56,20 @@ type Query {
   conferences: [Conference!]!
 }
 
+"""Submission entity model type"""
+type Submission {
+  abstract: String!
+  authors: [User!]!
+  createdAt: DateTime!
+  id: ID!
+  keywords: [String!]!
+  name: String!
+  submissionUrl: String
+  updatedAt: DateTime!
+}
+
 """User reference type from users microservice"""
 type User {
   id: ID!
+  name: String
 }
