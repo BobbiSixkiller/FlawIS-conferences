@@ -17,10 +17,6 @@ export class User {
 	@Field(() => ID)
 	@Property()
 	id: ObjectId;
-
-	@Field({ nullable: true })
-	@Property()
-	name?: string;
 }
 
 @ObjectType({ description: "Attendee model type" })

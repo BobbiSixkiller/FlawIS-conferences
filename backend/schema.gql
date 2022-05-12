@@ -13,6 +13,13 @@ directive @provides(fields: String!) on FIELD_DEFINITION
 
 directive @requires(fields: String!) on FIELD_DEFINITION
 
+type Address {
+  city: String!
+  country: String!
+  postal: String!
+  street: String!
+}
+
 """Attendee model type"""
 type Attendee {
   conference: Conference!
@@ -25,18 +32,39 @@ type Attendee {
   withSubmission: Boolean!
 }
 
+"""Conference hosting organization's billing information"""
+type Billing {
+  DIC: String
+  ICDPH: String
+  ICO: String
+  address: Address!
+  name: String!
+}
+
 """Conference model type"""
 type Conference {
   createdAt: DateTime!
+  description: String!
+  host: Host!
   id: ID!
+  logoUrl: String!
   name: String!
+  sections: [Section!]!
   updatedAt: DateTime!
+  venue: Venue!
 }
 
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
 scalar DateTime
+
+"""Conference hosting organization"""
+type Host {
+  billing: Billing!
+  logoUrl: String!
+  stampUrl: String!
+}
 
 """Invoice entity model type"""
 type Invoice {
@@ -56,14 +84,36 @@ type Query {
   conferences: [Conference!]!
 }
 
+"""Conference's section entity model type"""
+type Section {
+  abstract: String!
+  conference: Conference!
+  createdAt: DateTime!
+  description: String!
+  id: ID!
+  name: String!
+  submissions: [Submission!]!
+  updatedAt: DateTime!
+}
+
+"""The submissions's review process status"""
+enum Status {
+  Accepted
+  Rejected
+  Reviewing
+}
+
 """Submission entity model type"""
 type Submission {
   abstract: String!
   authors: [User!]!
+  conference: Conference!
   createdAt: DateTime!
   id: ID!
   keywords: [String!]!
   name: String!
+  section: Section!
+  status: Status!
   submissionUrl: String
   updatedAt: DateTime!
 }
@@ -71,5 +121,10 @@ type Submission {
 """User reference type from users microservice"""
 type User {
   id: ID!
-  name: String
+}
+
+"""Venue that conference takes place in"""
+type Venue {
+  address: Address!
+  name: String!
 }
