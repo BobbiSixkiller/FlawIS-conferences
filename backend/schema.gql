@@ -20,19 +20,27 @@ type Address {
   street: String!
 }
 
+input AddressInput {
+  city: String!
+  country: String!
+  postal: String!
+  street: String!
+}
+
 """Attendee model type"""
 type Attendee {
   conference: Conference!
   createdAt: DateTime!
   id: ID!
   invoice: Invoice!
+  online: Boolean!
   submissions: [Submission!]
   updatedAt: DateTime!
   user: User!
   withSubmission: Boolean!
 }
 
-"""Conference hosting organization's billing information"""
+"""Billing information"""
 type Billing {
   DIC: String
   ICDPH: String
@@ -41,17 +49,41 @@ type Billing {
   name: String!
 }
 
+input BillingInput {
+  DIC: String
+  ICDPH: String
+  ICO: String
+  address: AddressInput!
+  name: String!
+}
+
 """Conference model type"""
 type Conference {
   createdAt: DateTime!
   description: String!
-  host: Host!
+  end: DateTime
+  host: Host
   id: ID!
   logoUrl: String!
   name: String!
+  regStart: DateTime
   sections: [Section!]!
+  start: DateTime
+  tickets: [Ticket!]!
   updatedAt: DateTime!
-  venue: Venue!
+  venue: Venue
+}
+
+input ConferenceInput {
+  description: String!
+  end: DateTime
+  host: HostInput
+  logoUrl: String!
+  name: String!
+  regStart: DateTime
+  start: DateTime
+  tickets: TicketInput
+  venue: VenueInput
 }
 
 """
@@ -66,14 +98,37 @@ type Host {
   stampUrl: String!
 }
 
+input HostInput {
+  billing: BillingInput!
+  logoUrl: String!
+  stampUrl: String!
+}
+
 """Invoice entity model type"""
 type Invoice {
   id: ID!
+  invoice: InvoiceData!
+  issuer: Host!
+  payer: Billing!
+}
+
+"""The body of an invoice"""
+type InvoiceData {
+  body: String!
+  comment: String!
+  dueDate: DateTime!
+  issueDate: DateTime!
+  ticketPrice: Int!
+  type: String!
+  variableSymbol: String!
+  vat: Int!
+  vatDate: DateTime!
 }
 
 type Mutation {
   addAttendee(conferenceId: ObjectId!): Attendee!
-  createConference: Conference!
+  createConference(data: ConferenceInput!): Conference!
+  updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
 }
 
 """Mongo object id scalar type"""
@@ -82,6 +137,7 @@ scalar ObjectId
 type Query {
   attendees: [Attendee!]!
   conferences: [Conference!]!
+  upcomingConferences: [Conference!]!
 }
 
 """Conference's section entity model type"""
@@ -118,13 +174,37 @@ type Submission {
   updatedAt: DateTime!
 }
 
+"""Conference ticket type"""
+type Ticket {
+  description: String!
+  id: ID!
+  name: String!
+  online: Boolean!
+  price: Int!
+  withSubmission: Boolean!
+}
+
+input TicketInput {
+  description: String!
+  name: String!
+  online: Boolean!
+  price: Int!
+  withSubmission: Boolean!
+}
+
 """User reference type from users microservice"""
 type User {
   id: ID!
+  name: String!
 }
 
 """Venue that conference takes place in"""
 type Venue {
   address: Address!
+  name: String!
+}
+
+input VenueInput {
+  address: AddressInput!
   name: String!
 }

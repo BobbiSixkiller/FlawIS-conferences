@@ -6,14 +6,14 @@ import { Ref } from "../util/types";
 import { Conference } from "./Conference";
 import { Submission } from "./Submission";
 
-@ObjectType({description: "Conference's section entity model type"})
+@ObjectType({ description: "Conference's section entity model type" })
 export class Section extends TimeStamps {
 	@Field(() => ID)
 	id: ObjectId;
 
 	@Field(() => Conference)
-	@Property({ref: () => Conference})
-	conference: Ref<Conference>
+	@Property({ ref: () => Conference })
+	conference: Ref<Conference>;
 
 	@Field()
 	@Property()
@@ -27,8 +27,8 @@ export class Section extends TimeStamps {
 	@Property()
 	description: string;
 
-	@Field(()=>[Submission])
-	submissions: Submission[]
+	@Field(() => [Submission])
+	submissions: Submission[];
 
 	@Field()
 	createdAt: Date;

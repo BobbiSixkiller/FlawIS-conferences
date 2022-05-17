@@ -1,28 +1,70 @@
 import { prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
-import { Field, ID, ObjectType } from "type-graphql";
+import { Field, ID, Int, ObjectType } from "type-graphql";
 
 import { Ref } from "../util/types";
-import { Conference } from "./Conference";
+import { Billing, Conference, Host } from "./Conference";
 
-class Payer {}
+@ObjectType({ description: "The body of an invoice" })
+class InvoiceData {
+	@Field()
+	@Property({ default: "Faktúra" })
+	type: String;
 
-class Issuer {}
+	@Field()
+	@Property({ default: Date.now() })
+	issueDate: Date;
 
-class InvoiceData {}
+	@Field()
+	@Property({ default: Date.now() })
+	vatDate: Date;
+
+	@Field()
+	@Property({ default: new Date().setDate(new Date().getDate() + 30) })
+	dueDate: Date;
+
+	@Field()
+	@Property()
+	variableSymbol: String;
+
+	@Field(() => Int)
+	@Property()
+	ticketPrice: Number;
+
+	@Field(() => Int)
+	@Property()
+	vat: Number;
+
+	@Field()
+	@Property()
+	body: String;
+
+	@Field()
+	@Property()
+	comment: String;
+}
 
 @ObjectType({ description: "Invoice entity model type" })
 export class Invoice extends TimeStamps {
 	@Field(() => ID)
 	id: ObjectId;
 
-	payer: Payer;
+	@Field(() => Billing)
+	@Property({ _id: false })
+	payer: Billing;
 
-	issuer: Issuer;
+	@Field(() => Host)
+	@Property({ _id: false })
+	issuer: Host;
 
+	@Field(() => InvoiceData)
+	@Property({ _id: false })
 	invoice: InvoiceData;
 
-	@Property({ ref: () => Conference })
-	conference: Ref<Conference>;
+	@Property()
+	conference: ObjectId;
+
+	@Property()
+	user: ObjectId;
 }

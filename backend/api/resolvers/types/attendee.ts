@@ -1,13 +1,11 @@
-import {  Field, ObjectType, ArgsType, Int } from "type-graphql";
-import {
-	Min,
-	Max,
-} from "class-validator";
+import { Field, ObjectType, ArgsType, Int, InputType } from "type-graphql";
+import { Min, Max } from "class-validator";
 import { ObjectId } from "mongodb";
 
 import { Attendee } from "../../entitites/Attendee";
 import CreateConnection from "./pagination";
 import { RefDocExists } from "../../util/validation";
+import { Conference } from "../../entitites/Conference";
 
 @ObjectType({
 	description: "UserConnection type enabling cursor based pagination",
@@ -39,3 +37,8 @@ export class AttendeeArgs {
 	last?: number;
 }
 
+@InputType({ description: "Attendee input type" })
+export class AttendeeInput {
+	@RefDocExists(Conference, { message: "Conference not found!" })
+	conference: ObjectId;
+}

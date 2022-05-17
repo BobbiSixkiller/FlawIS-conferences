@@ -17,6 +17,10 @@ export class User {
 	@Field(() => ID)
 	@Property()
 	id: ObjectId;
+
+	@Field()
+	@Property()
+	name: string;
 }
 
 @ObjectType({ description: "Attendee model type" })
@@ -39,6 +43,10 @@ export class Attendee extends TimeStamps {
 	@Field(() => Boolean)
 	@Property({ default: false })
 	withSubmission: boolean;
+
+	@Field(() => Boolean)
+	@Property({ default: false })
+	online: boolean;
 
 	@Field(() => [Submission], { nullable: true })
 	@Property({ ref: () => Submission })
