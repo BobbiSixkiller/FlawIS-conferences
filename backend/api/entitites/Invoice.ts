@@ -1,10 +1,9 @@
 import { prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
-import { Field, ID, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 
-import { Ref } from "../util/types";
-import { Billing, Conference, Host } from "./Conference";
+import { Billing, Host } from "./Conference";
 
 @ObjectType({ description: "The body of an invoice" })
 class InvoiceData {
@@ -45,21 +44,18 @@ class InvoiceData {
 	comment: String;
 }
 
-@ObjectType({ description: "Invoice entity model type" })
+@ObjectType({ description: "Invoice entity subdocument type" })
 export class Invoice extends TimeStamps {
-	@Field(() => ID)
-	id: ObjectId;
-
 	@Field(() => Billing)
-	@Property({ _id: false })
+	@Property({ type: () => Billing, _id: false })
 	payer: Billing;
 
 	@Field(() => Host)
-	@Property({ _id: false })
+	@Property({ type: () => Host, _id: false })
 	issuer: Host;
 
 	@Field(() => InvoiceData)
-	@Property({ _id: false })
+	@Property({ type: () => InvoiceData, _id: false })
 	invoice: InvoiceData;
 
 	@Property()

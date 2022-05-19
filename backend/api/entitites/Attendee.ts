@@ -20,7 +20,15 @@ export class User {
 
 	@Field()
 	@Property()
-	name: string;
+	email: string;
+
+	@Field()
+	@Property()
+	withSubmission: boolean;
+
+	@Field()
+	@Property()
+	online: boolean;
 }
 
 @ObjectType({ description: "Attendee model type" })
@@ -37,16 +45,8 @@ export class Attendee extends TimeStamps {
 	user: User;
 
 	@Field(() => Invoice)
-	@Property({ ref: () => Invoice })
-	invoice: Ref<Invoice>;
-
-	@Field(() => Boolean)
-	@Property({ default: false })
-	withSubmission: boolean;
-
-	@Field(() => Boolean)
-	@Property({ default: false })
-	online: boolean;
+	@Property({ type: () => Invoice })
+	invoice: Invoice;
 
 	@Field(() => [Submission], { nullable: true })
 	@Property({ ref: () => Submission })

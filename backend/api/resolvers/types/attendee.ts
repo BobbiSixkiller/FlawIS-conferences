@@ -5,7 +5,6 @@ import { ObjectId } from "mongodb";
 import { Attendee } from "../../entitites/Attendee";
 import CreateConnection from "./pagination";
 import { RefDocExists } from "../../util/validation";
-import { Conference } from "../../entitites/Conference";
 
 @ObjectType({
 	description: "UserConnection type enabling cursor based pagination",
@@ -37,8 +36,11 @@ export class AttendeeArgs {
 	last?: number;
 }
 
-@InputType({ description: "Attendee input type" })
+@InputType()
 export class AttendeeInput {
-	@RefDocExists(Conference, { message: "Conference not found!" })
-	conference: ObjectId;
+	@Field()
+	conferenceId: ObjectId;
+
+	@Field()
+	ticketId: ObjectId;
 }

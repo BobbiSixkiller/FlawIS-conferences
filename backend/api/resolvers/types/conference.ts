@@ -1,11 +1,5 @@
 import { Field, InputType, Int } from "type-graphql";
-import {
-	IsBoolean,
-	IsDate,
-	IsNumberString,
-	IsString,
-	Length,
-} from "class-validator";
+import { IsBoolean, IsDate, IsNumberString, IsString } from "class-validator";
 
 import {
 	Address,
@@ -18,39 +12,50 @@ import {
 @InputType()
 class AddressInput implements Address {
 	@Field()
-	@Length(1, 100, { message: "Street must be 1-100 characters long!" })
+	@IsString()
 	street: string;
 
 	@Field()
-	@Length(1, 100, { message: "City must be 1-100 characters long!" })
+	@IsString()
 	city: string;
 
 	@Field()
-	@Length(1, 20, { message: "Postal code be 1-20 characters long!" })
+	@IsString()
 	postal: string;
 
 	@Field()
-	@Length(1, 50, { message: "Country name be 1-50 characters long!" })
+	@IsString()
 	country: string;
 }
 
 @InputType()
 export class BillingInput implements Billing {
 	@Field()
-	@Length(1, 100, { message: "Name must be 1-100 characters long!" })
+	@IsString()
 	name: string;
 
 	@Field(() => AddressInput)
 	address: AddressInput;
 
-	@Field({ nullable: true })
-	DIC?: string;
+	@Field()
+	@IsString()
+	DIC: string;
+
+	@Field()
+	@IsString()
+	ICDPH: string;
+
+	@Field()
+	@IsString()
+	ICO: string;
 
 	@Field({ nullable: true })
-	ICDPH?: string;
+	@IsString()
+	IBAN?: string;
 
 	@Field({ nullable: true })
-	ICO?: string;
+	@IsString()
+	SWIFT?: string;
 }
 
 @InputType()
@@ -70,7 +75,7 @@ export class HostInput implements Partial<Host> {
 @InputType()
 export class VenueInput implements Partial<Venue> {
 	@Field()
-	@Length(1, 100, { message: "Name must be 1-100 characters long!" })
+	@IsString()
 	name: string;
 
 	@Field(() => AddressInput)
@@ -80,11 +85,11 @@ export class VenueInput implements Partial<Venue> {
 @InputType()
 export class TicketInput implements Partial<Ticket> {
 	@Field()
-	@Length(1, 100, { message: "Name must be 1-100 characters long!" })
+	@IsString()
 	name: string;
 
 	@Field()
-	@Length(1, 100, { message: "Name must be 1-300 characters long!" })
+	@IsString()
 	description: string;
 
 	@Field()
@@ -103,7 +108,7 @@ export class TicketInput implements Partial<Ticket> {
 @InputType()
 export class ConferenceInput {
 	@Field()
-	@Length(1, 100, { message: "Name must be 1-100 characters long!" })
+	@IsString()
 	name: string;
 
 	@Field()

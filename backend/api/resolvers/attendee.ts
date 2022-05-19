@@ -1,6 +1,6 @@
-import { ObjectId } from "mongodb";
 import {
 	Arg,
+	Authorized,
 	Ctx,
 	FieldResolver,
 	Mutation,
@@ -9,10 +9,13 @@ import {
 	Root,
 } from "type-graphql";
 import { Service } from "typedi";
+
 import { Attendee } from "../entitites/Attendee";
-import { Conference } from "../entitites/Conference";
+import { Conference, Ticket } from "../entitites/Conference";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
+import { CheckTicket } from "../util/validation";
+import { AttendeeInput } from "./types/attendee";
 
 @Service()
 @Resolver(() => Attendee)
@@ -27,14 +30,25 @@ export class AttendeeResolver {
 		return await this.attendeeService.findAll({});
 	}
 
+	@Authorized()
 	@Mutation(() => Attendee)
 	async addAttendee(
-		@Arg("conferenceId") conferenceId: ObjectId,
+		// @Arg("conferenceId") conferenceId: ObjectId,
+		// @Arg("ticketId") ticketId: ObjectId,
+		@Arg("data") { conferenceId }: AttendeeInput,
+		@CheckTicket() ticket: Ticket,
 		@Ctx() { user }: Context
 	): Promise<Attendee> {
+		console.log(ticket);
+
 		const attendee = await this.attendeeService.create({
 			conference: conferenceId,
-			user: { id: user?.id },
+			user: {
+				id: user!.id,
+				email: user!.email,
+				withSubmission: ticket.withSubmission,
+				online: ticket.online,
+			},
 		});
 
 		return attendee;
