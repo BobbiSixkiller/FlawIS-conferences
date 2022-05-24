@@ -22,6 +22,14 @@ export class ConferenceResolver {
 		private readonly sectionService = new CRUDservice(Section)
 	) {}
 
+	@Query(() => Conference)
+	async conference(@Arg("id") id: ObjectId): Promise<Conference> {
+		const conference = await this.conferenceService.findOne({ _id: id });
+		if (!conference) throw new UserInputError("Conference not found!");
+
+		return conference;
+	}
+
 	@Query(() => [Conference])
 	async conferences(): Promise<Conference[]> {
 		return await this.conferenceService.findAll({});
@@ -50,7 +58,7 @@ export class ConferenceResolver {
 		if (!conference) throw new UserInputError("Conference not found!");
 
 		for (const [key, value] of Object.entries(conferenceInput)) {
-			conference[key as keyof ConferenceInput] = value;
+			conference[key as keyof Conference] = value;
 		}
 
 		return await conference.save();

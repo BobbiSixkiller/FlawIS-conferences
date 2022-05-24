@@ -3,8 +3,7 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
 import { Field, ID, Int, ObjectType } from "type-graphql";
 
-import { Ref } from "../util/types";
-import { Billing, Conference, Host } from "./Conference";
+import { Billing, Host } from "./Conference";
 
 @ObjectType({ description: "The body of an invoice" })
 class InvoiceData {

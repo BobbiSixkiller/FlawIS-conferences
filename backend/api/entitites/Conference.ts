@@ -1,9 +1,10 @@
-import { Field, ID, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import { prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
 import { Section } from "./Section";
+import { ObjectIdScalar } from "../util/scalars";
 
 @ObjectType()
 export class Address {
@@ -75,7 +76,7 @@ export class Venue {
 
 @ObjectType({ description: "Conference ticket type" })
 export class Ticket {
-	@Field(() => ID)
+	@Field(() => ObjectIdScalar)
 	id: ObjectId;
 
 	@Field()
@@ -101,7 +102,7 @@ export class Ticket {
 
 @ObjectType({ description: "Conference model type" })
 export class Conference extends TimeStamps {
-	@Field(() => ID)
+	@Field(() => ObjectIdScalar)
 	id: ObjectId;
 
 	@Field()

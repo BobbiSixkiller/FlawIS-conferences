@@ -14,14 +14,16 @@ import { buildFederatedSchema } from "./util/buildFederatedSchema";
 import env from "dotenv";
 import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
+
 import { AttendeeResolver } from "./resolvers/attendee";
+import { SectionResolver } from "./resolvers/section";
 
 env.config();
 
 async function main() {
 	//Build schema
 	const schema = await buildFederatedSchema({
-		resolvers: [ConferenceResolver, AttendeeResolver],
+		resolvers: [ConferenceResolver, SectionResolver, AttendeeResolver],
 		// use document converting middleware
 		globalMiddlewares: [TypegooseMiddleware],
 		// use ObjectId scalar mapping

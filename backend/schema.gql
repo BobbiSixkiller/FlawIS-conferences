@@ -63,7 +63,7 @@ type Conference {
   description: String!
   end: DateTime
   host: Host
-  id: ID!
+  id: ObjectId!
   logoUrl: String!
   name: String!
   regStart: DateTime
@@ -125,10 +125,22 @@ type InvoiceData {
   vatDate: DateTime!
 }
 
+"""Language code"""
+type Language {
+  code: String!
+}
+
+"""Language input"""
+input LanguageInput {
+  code: String!
+}
+
 type Mutation {
   addAttendee(conferenceId: ObjectId!): Attendee!
   createConference(data: ConferenceInput!): Conference!
+  createSection(data: SectionInput!): Section!
   updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
+  updateSection(data: SectionInput!, id: ObjectId!): Section!
 }
 
 """Mongo object id scalar type"""
@@ -136,20 +148,30 @@ scalar ObjectId
 
 type Query {
   attendees: [Attendee!]!
+  conference(id: ObjectId!): Conference!
   conferences: [Conference!]!
+  section(id: ObjectId!): Section!
   upcomingConferences: [Conference!]!
 }
 
 """Conference's section entity model type"""
 type Section {
-  abstract: String!
-  conference: Conference!
+  conference: String!
   createdAt: DateTime!
   description: String!
-  id: ID!
+  id: ObjectId!
+  languages: [Language!]!
   name: String!
   submissions: [Submission!]!
   updatedAt: DateTime!
+}
+
+"""Conference section input type"""
+input SectionInput {
+  conference: String!
+  description: String!
+  languages: [LanguageInput!]!
+  name: String!
 }
 
 """The submissions's review process status"""
@@ -177,7 +199,7 @@ type Submission {
 """Conference ticket type"""
 type Ticket {
   description: String!
-  id: ID!
+  id: ObjectId!
   name: String!
   online: Boolean!
   price: Int!
