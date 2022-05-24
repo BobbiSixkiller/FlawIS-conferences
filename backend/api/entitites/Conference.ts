@@ -27,21 +27,32 @@ export class Address {
 
 @ObjectType({ description: "Billing information" })
 export class Billing {
+	@Field(() => ID, { nullable: true })
+	id?: ObjectId;
+
 	@Field()
 	@Property()
 	name: string;
 
-	@Field({ nullable: true })
+	@Field()
 	@Property()
-	ICO?: string;
+	ICO: string;
+
+	@Field()
+	@Property()
+	DIC: string;
+
+	@Field()
+	@Property()
+	ICDPH: string;
 
 	@Field({ nullable: true })
 	@Property()
-	DIC?: string;
+	IBAN?: string;
 
 	@Field({ nullable: true })
 	@Property()
-	ICDPH?: string;
+	SWIFT?: string;
 
 	@Field(() => Address)
 	@Property({ _id: false })

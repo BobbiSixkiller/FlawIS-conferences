@@ -33,26 +33,34 @@ type Attendee {
   createdAt: DateTime!
   id: ID!
   invoice: Invoice!
-  online: Boolean!
   submissions: [Submission!]
   updatedAt: DateTime!
   user: User!
-  withSubmission: Boolean!
+}
+
+input AttendeeInput {
+  conferenceId: ObjectId!
+  ticketId: ObjectId!
 }
 
 """Billing information"""
 type Billing {
-  DIC: String
-  ICDPH: String
-  ICO: String
+  DIC: String!
+  IBAN: String
+  ICDPH: String!
+  ICO: String!
+  SWIFT: String
   address: Address!
+  id: ID
   name: String!
 }
 
 input BillingInput {
-  DIC: String
-  ICDPH: String
-  ICO: String
+  DIC: String!
+  IBAN: String
+  ICDPH: String!
+  ICO: String!
+  SWIFT: String
   address: AddressInput!
   name: String!
 }
@@ -104,9 +112,8 @@ input HostInput {
   stampUrl: String!
 }
 
-"""Invoice entity model type"""
+"""Invoice entity subdocument type"""
 type Invoice {
-  id: ID!
   invoice: InvoiceData!
   issuer: Host!
   payer: Billing!
@@ -136,7 +143,7 @@ input LanguageInput {
 }
 
 type Mutation {
-  addAttendee(conferenceId: ObjectId!): Attendee!
+  addAttendee(data: AttendeeInput!): Attendee!
   createConference(data: ConferenceInput!): Conference!
   createSection(data: SectionInput!): Section!
   updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
@@ -216,8 +223,10 @@ input TicketInput {
 
 """User reference type from users microservice"""
 type User {
+  email: String!
   id: ID!
-  name: String!
+  online: Boolean!
+  withSubmission: Boolean!
 }
 
 """Venue that conference takes place in"""
