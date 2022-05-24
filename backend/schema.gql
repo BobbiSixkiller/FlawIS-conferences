@@ -31,14 +31,15 @@ input AddressInput {
 type Attendee {
   conference: Conference!
   createdAt: DateTime!
-  id: ID!
+  id: ObjectId!
   invoice: Invoice!
-  submissions: [Submission!]
+  submissions: [Submission!]!
   updatedAt: DateTime!
   user: User!
 }
 
 input AttendeeInput {
+  billing: BillingInput!
   conferenceId: ObjectId!
   ticketId: ObjectId!
 }
@@ -51,7 +52,7 @@ type Billing {
   ICO: String!
   SWIFT: String
   address: Address!
-  id: ID
+  id: ObjectId
   name: String!
 }
 
@@ -67,6 +68,7 @@ input BillingInput {
 
 """Conference model type"""
 type Conference {
+  attendees: [Attendee!]!
   createdAt: DateTime!
   description: String!
   end: DateTime
@@ -79,6 +81,7 @@ type Conference {
   start: DateTime
   tickets: [Ticket!]!
   updatedAt: DateTime!
+  variableSymbol: String!
   venue: Venue
 }
 
@@ -91,6 +94,7 @@ input ConferenceInput {
   regStart: DateTime
   start: DateTime
   tickets: TicketInput
+  variableSymbol: String!
   venue: VenueInput
 }
 
@@ -114,7 +118,7 @@ input HostInput {
 
 """Invoice entity subdocument type"""
 type Invoice {
-  invoice: InvoiceData!
+  body: InvoiceData!
   issuer: Host!
   payer: Billing!
 }
@@ -132,6 +136,25 @@ type InvoiceData {
   vatDate: DateTime!
 }
 
+input InvoiceDataInput {
+  body: String!
+  comment: String!
+  dueDate: DateTime!
+  issueDate: DateTime!
+  ticketPrice: Int!
+  type: String!
+  variableSymbol: String!
+  vat: Int!
+  vatDate: DateTime!
+}
+
+"""Invoice data input type facilitating attendee's invoice update"""
+input InvoiceInput {
+  body: InvoiceDataInput
+  issuer: BillingInput
+  payer: BillingInput
+}
+
 """Language code"""
 type Language {
   code: String!
@@ -146,7 +169,10 @@ type Mutation {
   addAttendee(data: AttendeeInput!): Attendee!
   createConference(data: ConferenceInput!): Conference!
   createSection(data: SectionInput!): Section!
+  deleteSection(id: ObjectId!): Boolean!
+  removeAttendee(id: ObjectId!): Boolean!
   updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
+  updateInvoice(data: InvoiceInput!, id: ObjectId!): Attendee!
   updateSection(data: SectionInput!, id: ObjectId!): Section!
 }
 
@@ -194,7 +220,7 @@ type Submission {
   authors: [User!]!
   conference: Conference!
   createdAt: DateTime!
-  id: ID!
+  id: ObjectId!
   keywords: [String!]!
   name: String!
   section: Section!
@@ -223,10 +249,9 @@ input TicketInput {
 
 """User reference type from users microservice"""
 type User {
-  email: String!
-  id: ID!
-  online: Boolean!
-  withSubmission: Boolean!
+  id: ObjectId!
+  online: Boolean
+  withSubmission: Boolean
 }
 
 """Venue that conference takes place in"""

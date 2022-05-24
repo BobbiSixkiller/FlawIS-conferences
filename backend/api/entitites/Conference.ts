@@ -4,7 +4,7 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
 import { Section } from "./Section";
-import { ObjectIdScalar } from "../util/scalars";
+import { Attendee } from "./Attendee";
 
 @ObjectType()
 export class Address {
@@ -27,7 +27,7 @@ export class Address {
 
 @ObjectType({ description: "Billing information" })
 export class Billing {
-	@Field(() => ID, { nullable: true })
+	@Field({ nullable: true })
 	id?: ObjectId;
 
 	@Field()
@@ -87,7 +87,7 @@ export class Venue {
 
 @ObjectType({ description: "Conference ticket type" })
 export class Ticket {
-	@Field(() => ObjectIdScalar)
+	@Field()
 	id: ObjectId;
 
 	@Field()
@@ -113,7 +113,7 @@ export class Ticket {
 
 @ObjectType({ description: "Conference model type" })
 export class Conference extends TimeStamps {
-	@Field(() => ObjectIdScalar)
+	@Field()
 	id: ObjectId;
 
 	@Field()
@@ -128,6 +128,10 @@ export class Conference extends TimeStamps {
 	@Property()
 	description: string;
 
+	@Field()
+	@Property()
+	variableSymbol: string;
+
 	@Field(() => Host, { nullable: true })
 	@Property({ _id: false })
 	host?: Host;
@@ -140,18 +144,7 @@ export class Conference extends TimeStamps {
 	sections: Section[];
 
 	@Field(() => [Ticket])
-	@Property({
-		type: () => Ticket,
-		default: [
-			{
-				name: "Active attendee",
-				description: "Attendee with his/her own submission",
-				price: 5000,
-				withSubmission: true,
-				online: false,
-			},
-		],
-	})
+	@Property({ type: () => Ticket, default: [] })
 	tickets: Ticket[];
 
 	@Field({ nullable: true })
@@ -160,11 +153,14 @@ export class Conference extends TimeStamps {
 
 	@Field({ nullable: true })
 	@Property()
-	start: Date;
+	start?: Date;
 
 	@Field({ nullable: true })
 	@Property()
-	end: Date;
+	end?: Date;
+
+	@Field(() => [Attendee])
+	attendees: Attendee[];
 
 	@Field()
 	createdAt: Date;

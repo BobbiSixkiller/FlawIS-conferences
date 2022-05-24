@@ -1,11 +1,11 @@
 import { prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { Field, ID, ObjectType, registerEnumType } from "type-graphql";
+import { Field, ObjectType, registerEnumType } from "type-graphql";
 import { ObjectId } from "mongodb";
 
+import { Ref } from "../util/types";
 import { User } from "./Attendee";
 import { Conference } from "./Conference";
-import { Ref } from "../util/types";
 import { Section } from "./Section";
 
 enum Status {
@@ -21,7 +21,7 @@ registerEnumType(Status, {
 
 @ObjectType({ description: "Submission entity model type" })
 export class Submission extends TimeStamps {
-	@Field(() => ID)
+	@Field()
 	id: ObjectId;
 
 	@Field()

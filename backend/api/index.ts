@@ -11,12 +11,13 @@ import { ConferenceResolver } from "./resolvers/conference";
 
 import { buildFederatedSchema } from "./util/buildFederatedSchema";
 
-import env from "dotenv";
 import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
 
 import { AttendeeResolver } from "./resolvers/attendee";
 import { SectionResolver } from "./resolvers/section";
+
+import env from "dotenv";
 
 env.config();
 

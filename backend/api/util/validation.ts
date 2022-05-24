@@ -9,6 +9,9 @@ import { getModelForClass } from "@typegoose/typegoose";
 import { createParamDecorator } from "type-graphql";
 import { Conference } from "../entitites/Conference";
 import { UserInputError } from "apollo-server";
+import { Attendee } from "../entitites/Attendee";
+import { Context } from "./auth";
+import { User } from "./types";
 
 @ValidatorConstraint({ name: "RefDoc", async: true })
 class RefDocValidator implements ValidatorConstraintInterface {
@@ -39,7 +42,7 @@ export function RefDocExists(
 }
 
 export function CheckTicket(): ParameterDecorator {
-	return createParamDecorator(async ({ args }) => {
+	return createParamDecorator(async ({ args, context }) => {
 		const conference = await getModelForClass(Conference).findOne({
 			_id: args.data.conferenceId,
 		});
@@ -50,6 +53,14 @@ export function CheckTicket(): ParameterDecorator {
 		);
 		if (!ticket) throw new UserInputError("Invalid ticket!");
 
-		return ticket;
+		const { user } = context as Context;
+		const attendeeExists = await getModelForClass(Attendee).findOne({
+			conference: args.data.conferenceId,
+			"user.id": user!.id,
+		});
+		if (attendeeExists)
+			throw new UserInputError("You are already signed up for the conference!");
+
+		return { ticket, conference };
 	});
 }

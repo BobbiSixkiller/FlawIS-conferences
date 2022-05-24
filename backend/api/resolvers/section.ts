@@ -12,6 +12,7 @@ import { Service } from "typedi";
 import { Section } from "../entitites/Section";
 import { Submission } from "../entitites/Submission";
 import { CRUDservice } from "../services/CRUDservice";
+import { ObjectIdScalar } from "../util/scalars";
 import { SectionInput } from "./types/section";
 
 @Service()
@@ -23,7 +24,9 @@ export class SectionResolver {
 	) {}
 
 	@Query(() => Section)
-	async section(@Arg("id") id: ObjectId): Promise<Section> {
+	async section(
+		@Arg("id", () => ObjectIdScalar) id: ObjectId
+	): Promise<Section> {
 		const section = await this.sectionService.findOne({ _id: id });
 		if (!section) throw new UserInputError("Conference section not found!");
 
@@ -50,6 +53,15 @@ export class SectionResolver {
 		}
 
 		return await section.save();
+	}
+
+	@Mutation(() => Boolean)
+	async deleteSection(
+		@Arg("id", () => ObjectIdScalar) id: ObjectId
+	): Promise<boolean> {
+		const { deletedCount } = await this.sectionService.delete({ _id: id });
+
+		return deletedCount > 0;
 	}
 
 	@FieldResolver(() => [Submission])

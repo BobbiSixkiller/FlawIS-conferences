@@ -2,9 +2,11 @@ import { Field, ObjectType, ArgsType, Int, InputType } from "type-graphql";
 import { Min, Max } from "class-validator";
 import { ObjectId } from "mongodb";
 
-import { Attendee } from "../../entitites/Attendee";
+import { Attendee, Invoice } from "../../entitites/Attendee";
 import CreateConnection from "./pagination";
 import { RefDocExists } from "../../util/validation";
+import { BillingInput } from "./conference";
+import { Billing, Host } from "../../entitites/Conference";
 
 @ObjectType({
 	description: "UserConnection type enabling cursor based pagination",
@@ -43,4 +45,51 @@ export class AttendeeInput {
 
 	@Field()
 	ticketId: ObjectId;
+
+	@Field()
+	billing: BillingInput;
+}
+
+@InputType()
+class InvoiceDataInput {
+	@Field()
+	type: String;
+
+	@Field()
+	issueDate: Date;
+
+	@Field()
+	vatDate: Date;
+
+	@Field()
+	dueDate: Date;
+
+	@Field()
+	variableSymbol: String;
+
+	@Field(() => Int)
+	ticketPrice: Number;
+
+	@Field(() => Int)
+	vat: Number;
+
+	@Field()
+	body: String;
+
+	@Field()
+	comment: String;
+}
+
+@InputType({
+	description: "Invoice data input type facilitating attendee's invoice update",
+})
+export class InvoiceInput {
+	@Field(() => BillingInput, { nullable: true })
+	issuer: BillingInput;
+
+	@Field(() => BillingInput, { nullable: true })
+	payer: BillingInput;
+
+	@Field(() => InvoiceDataInput, { nullable: true })
+	body: InvoiceDataInput;
 }

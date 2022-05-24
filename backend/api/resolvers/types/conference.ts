@@ -119,6 +119,10 @@ export class ConferenceInput {
 	@IsString()
 	logoUrl: string;
 
+	@Field()
+	@IsString()
+	variableSymbol: string;
+
 	@Field({ nullable: true })
 	@IsDate()
 	regStart?: Date;

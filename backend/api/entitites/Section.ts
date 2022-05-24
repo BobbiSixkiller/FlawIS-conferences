@@ -1,8 +1,8 @@
 import { prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { ObjectId } from "mongoose";
+import { ObjectId } from "mongodb";
 import { Field, ObjectType } from "type-graphql";
-import { ObjectIdScalar } from "../util/scalars";
+
 import { Ref } from "../util/types";
 import { Conference } from "./Conference";
 import { Submission } from "./Submission";
@@ -16,7 +16,7 @@ export class Language {
 
 @ObjectType({ description: "Conference's section entity model type" })
 export class Section extends TimeStamps {
-	@Field(() => ObjectIdScalar)
+	@Field()
 	id: ObjectId;
 
 	@Field(() => String)
