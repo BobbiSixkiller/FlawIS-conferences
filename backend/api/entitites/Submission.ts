@@ -8,7 +8,7 @@ import { User } from "./Attendee";
 import { Conference } from "./Conference";
 import { Section } from "./Section";
 
-enum Status {
+export enum Status {
 	Accepted = "ACCEPTED",
 	Rejected = "REJECTED",
 	Reviewing = "REVIEWING",
