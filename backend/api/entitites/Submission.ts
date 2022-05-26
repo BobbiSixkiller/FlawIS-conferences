@@ -1,6 +1,11 @@
-import { prop as Property } from "@typegoose/typegoose";
+import { getModelForClass, pre, prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { Field, ObjectType, registerEnumType } from "type-graphql";
+import {
+	ArgumentValidationError,
+	Field,
+	ObjectType,
+	registerEnumType,
+} from "type-graphql";
 import { ObjectId } from "mongodb";
 
 import { Ref } from "../util/types";
@@ -19,6 +24,35 @@ registerEnumType(Status, {
 	description: "The submissions's review process status", // this one is optional
 });
 
+@ObjectType({ description: "Keyword" })
+export class Keyword {
+	@Field()
+	@Property()
+	keyword: string;
+}
+
+@pre<Submission>("save", async function () {
+	if (this.isNew) {
+		const submissionExists = await getModelForClass(Submission)
+			.findOne({
+				name: this.name,
+			})
+			.exec();
+		if (submissionExists)
+			throw new ArgumentValidationError([
+				{
+					target: Submission, // Object that was validated.
+					property: "name", // Object's property that haven't pass validation.
+					value: this.name, // Value that haven't pass a validation.
+					constraints: {
+						// Constraints that failed validation with error messages.
+						EmailExists: "Submission with provided name already exists!",
+					},
+					//children?: ValidationError[], // Contains all nested validation errors of the property
+				},
+			]);
+	}
+})
 @ObjectType({ description: "Submission entity model type" })
 export class Submission extends TimeStamps {
 	@Field()
@@ -32,9 +66,9 @@ export class Submission extends TimeStamps {
 	@Property()
 	abstract: string;
 
-	@Field(() => [String])
-	@Property({ type: () => [String] })
-	keywords: string[];
+	@Field(() => [Keyword])
+	@Property({ type: () => Keyword })
+	keywords: Keyword[];
 
 	@Field({ nullable: true })
 	@Property()

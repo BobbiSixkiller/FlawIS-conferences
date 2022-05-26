@@ -11,7 +11,6 @@ import { Conference } from "../entitites/Conference";
 import { UserInputError } from "apollo-server";
 import { Attendee } from "../entitites/Attendee";
 import { Context } from "./auth";
-import { User } from "./types";
 
 @ValidatorConstraint({ name: "RefDoc", async: true })
 class RefDocValidator implements ValidatorConstraintInterface {

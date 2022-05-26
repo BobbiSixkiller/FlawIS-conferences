@@ -26,7 +26,6 @@ import { sendMail } from "../util/mail";
 
 import env from "dotenv";
 import { generatePdf, invoice } from "../util/invoice";
-import { findSelectionSetOnNode } from "@apollo/federation/dist/composition/utils";
 
 env.config();
 
@@ -120,6 +119,8 @@ export class AttendeeResolver {
 		for (const [key, value] of Object.entries(invoiceInput)) {
 			attendee.invoice[key as keyof InvoiceInput] = value;
 		}
+
+		sendMail;
 
 		return attendee.save();
 	}
