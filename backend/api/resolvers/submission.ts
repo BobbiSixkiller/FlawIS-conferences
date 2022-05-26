@@ -92,20 +92,6 @@ export class SubmissionResolver {
 		return true;
 	}
 
-	@Authorized()
-	@Mutation(() => Submission)
-	async addCoAuthor(
-		@Arg("id") id: ObjectId,
-		@Ctx() { user }: Context
-	): Promise<Submission> {
-		const submission = await this.submissionService.findOne({ _id: id });
-		if (!submission) throw new Error("Submission not found!");
-
-		submission.authors.push({ id: user!.id });
-
-		return await submission.save();
-	}
-
 	@Mutation(() => Boolean)
 	async deleteSubmission(@Arg("id") id: ObjectId): Promise<boolean> {
 		const { deletedCount } = await this.submissionService.delete({ _id: id });

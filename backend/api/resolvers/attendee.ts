@@ -43,6 +43,7 @@ export class AttendeeResolver {
 		return await this.attendeeService.findAll({});
 	}
 
+	//Refactor to check for co-author header and run a submission update to push new coauthor into the authors array
 	@Authorized()
 	@Mutation(() => Attendee)
 	async addAttendee(
