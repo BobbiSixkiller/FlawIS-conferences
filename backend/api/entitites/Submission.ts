@@ -49,7 +49,7 @@ export class Submission extends TimeStamps {
 	section: Ref<Section>;
 
 	@Field(() => [User])
-	@Property({ type: () => [User], _id: false })
+	@Property({ type: () => User, _id: false })
 	authors: User[];
 
 	@Field(() => Status)

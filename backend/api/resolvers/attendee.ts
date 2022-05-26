@@ -11,19 +11,22 @@ import {
 import { ObjectId } from "mongodb";
 import { UserInputError } from "apollo-server";
 import { Service } from "typedi";
+import fs from "fs";
 import { CRUDservice } from "../services/CRUDservice";
 
 import { Attendee } from "../entitites/Attendee";
 import { Conference } from "../entitites/Conference";
 import { Submission } from "../entitites/Submission";
+import { AttendeeInput, InvoiceInput } from "./types/attendee";
+
 import { Context } from "../util/auth";
 import { VerifiedTicket } from "../util/types";
 import { CheckTicket } from "../util/validation";
-import { AttendeeInput, InvoiceInput } from "./types/attendee";
+import { sendMail } from "../util/mail";
 
 import env from "dotenv";
-import { sendMail } from "../util/sendMail";
-import { getModelForClass } from "@typegoose/typegoose";
+import { generatePdf, invoice } from "../util/invoice";
+import { findSelectionSetOnNode } from "@apollo/federation/dist/composition/utils";
 
 env.config();
 
@@ -34,16 +37,7 @@ export class AttendeeResolver {
 		private readonly attendeeService = new CRUDservice(Attendee),
 		private readonly conferenceService = new CRUDservice(Conference),
 		private readonly submissionService = new CRUDservice(Submission)
-	) {
-		const pipeline = [{ $match: { operationType: "insert" } }];
-
-		attendeeService.dataModel
-			.watch([], { fullDocument: "updateLookup" })
-			.on("change", (e) => {
-				console.log(e);
-				sendMail;
-			});
-	}
+	) {}
 
 	@Query(() => [Attendee])
 	async attendees(): Promise<Attendee[]> {
@@ -57,9 +51,9 @@ export class AttendeeResolver {
 		@CheckTicket() { ticket, conference }: VerifiedTicket,
 		@Ctx() { user }: Context
 	): Promise<Attendee> {
-		const ticketPrice = ticket.price / Number(process.env.VAT);
+		const ticketPrice = ticket.price / Number(process.env.VAT || 1.2);
 
-		return await this.attendeeService.create({
+		const attendee = await this.attendeeService.create({
 			conference: conferenceId,
 			user: {
 				id: user!.id,
@@ -79,6 +73,39 @@ export class AttendeeResolver {
 				},
 			},
 		});
+
+		const { pdf, path } = await generatePdf(invoice(attendee.invoice, "en"));
+
+		const locale: string = "en";
+
+		sendMail(
+			user!.email,
+			conference.name,
+			`Dear ${user!.name},\n\nYou have been successfully registered to ${
+				conference.name
+			}! You can find your invoice in the attachmenets.\n\nBest regards,\n\n${
+				conference.name
+			} team`,
+			`<html><head></head><body><p>Dear ${
+				user!.name
+			},</p><p>You have been successfully registered to ${
+				conference.name
+			}! You can find your invoice in the attachmenets.</p><p>Best regards,</p><p>${
+				conference.name
+			} team</p></body></html>`,
+			[
+				{
+					filename: locale === "en" ? "Invoice.pdf" : "Faktúra.pdf",
+					content: pdf,
+				},
+			]
+		);
+
+		fs.unlink(path, (err) => {
+			if (err) console.log(err);
+		});
+
+		return attendee;
 	}
 
 	@Authorized()

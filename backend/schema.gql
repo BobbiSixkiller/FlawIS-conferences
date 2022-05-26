@@ -44,6 +44,10 @@ input AttendeeInput {
   ticketId: ObjectId!
 }
 
+input AuthorInput {
+  id: ObjectId!
+}
+
 """Billing information"""
 type Billing {
   DIC: String!
@@ -167,13 +171,16 @@ input LanguageInput {
 
 type Mutation {
   addAttendee(data: AttendeeInput!): Attendee!
+  addSubmission(data: SubmissionInput!): Submission!
   createConference(data: ConferenceInput!): Conference!
   createSection(data: SectionInput!): Section!
   deleteSection(id: ObjectId!): Boolean!
+  deleteSubmission(id: ObjectId!): Boolean!
   removeAttendee(id: ObjectId!): Boolean!
   updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): Attendee!
   updateSection(data: SectionInput!, id: ObjectId!): Section!
+  updateSubmission(data: SubmissionInput!, id: ObjectId!): Submission!
 }
 
 """Mongo object id scalar type"""
@@ -184,6 +191,7 @@ type Query {
   conference(id: ObjectId!): Conference!
   conferences: [Conference!]!
   section(id: ObjectId!): Section!
+  submission(id: ObjectId!): Submission!
   upcomingConferences: [Conference!]!
 }
 
@@ -227,6 +235,16 @@ type Submission {
   status: Status!
   submissionUrl: String
   updatedAt: DateTime!
+}
+
+"""Submission entity model type"""
+input SubmissionInput {
+  abstract: String!
+  authors: [AuthorInput!]!
+  keywords: [String!]!
+  name: String!
+  status: Status!
+  submissionUrl: String
 }
 
 """Conference ticket type"""

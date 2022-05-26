@@ -16,6 +16,7 @@ import { authChecker } from "./util/auth";
 
 import { AttendeeResolver } from "./resolvers/attendee";
 import { SectionResolver } from "./resolvers/section";
+import { SubmissionResolver } from "./resolvers/submission";
 
 import env from "dotenv";
 
@@ -24,7 +25,12 @@ env.config();
 async function main() {
 	//Build schema
 	const schema = await buildFederatedSchema({
-		resolvers: [ConferenceResolver, SectionResolver, AttendeeResolver],
+		resolvers: [
+			ConferenceResolver,
+			SectionResolver,
+			SubmissionResolver,
+			AttendeeResolver,
+		],
 		// use document converting middleware
 		globalMiddlewares: [TypegooseMiddleware],
 		// use ObjectId scalar mapping

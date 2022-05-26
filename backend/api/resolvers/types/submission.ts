@@ -1,18 +1,16 @@
-import { Field, InputType,  } from "type-graphql";
+import { ObjectId } from "mongodb";
+import { Field, InputType } from "type-graphql";
 
 import { Status, Submission } from "../../entitites/Submission";
 
 @InputType({})
 class AuthorInput {
-
-
+	@Field()
+	id: ObjectId;
 }
-
 
 @InputType({ description: "Submission entity model type" })
 export class SubmissionInput implements Partial<Submission> {
-
-
 	@Field()
 	name: string;
 
@@ -30,6 +28,4 @@ export class SubmissionInput implements Partial<Submission> {
 
 	@Field(() => Status)
 	status: Status;
-
-
 }
