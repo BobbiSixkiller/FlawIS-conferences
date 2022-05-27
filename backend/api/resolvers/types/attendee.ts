@@ -2,11 +2,10 @@ import { Field, ObjectType, ArgsType, Int, InputType } from "type-graphql";
 import { Min, Max } from "class-validator";
 import { ObjectId } from "mongodb";
 
-import { Attendee, Invoice } from "../../entitites/Attendee";
+import { Attendee } from "../../entitites/Attendee";
 import CreateConnection from "./pagination";
-import { RefDocExists } from "../../util/validation";
+import { RefDocExists } from "../../util/decorators";
 import { BillingInput } from "./conference";
-import { Billing, Host } from "../../entitites/Conference";
 
 @ObjectType({
 	description: "UserConnection type enabling cursor based pagination",

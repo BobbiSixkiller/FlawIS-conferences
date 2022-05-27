@@ -11,6 +11,7 @@ import { Conference } from "../entitites/Conference";
 import { UserInputError } from "apollo-server";
 import { Attendee } from "../entitites/Attendee";
 import { Context } from "./auth";
+import { Section } from "../entitites/Section";
 
 @ValidatorConstraint({ name: "RefDoc", async: true })
 class RefDocValidator implements ValidatorConstraintInterface {
@@ -54,12 +55,29 @@ export function CheckTicket(): ParameterDecorator {
 
 		const { user } = context as Context;
 		const attendeeExists = await getModelForClass(Attendee).findOne({
-			conference: args.data.conferenceId,
+			conference: conference.id,
 			"user.id": user!.id,
 		});
 		if (attendeeExists)
 			throw new UserInputError("You are already signed up for the conference!");
 
 		return { ticket, conference };
+	});
+}
+
+export function CheckConferenceSection(): ParameterDecorator {
+	return createParamDecorator(async ({ args }) => {
+		const [conference, section] = await Promise.all([
+			getModelForClass(Conference).findOne({
+				_id: args.data.conferenceId,
+			}),
+			getModelForClass(Section).findOne({
+				_id: args.data.sectionId,
+			}),
+		]);
+		if (!conference) throw new UserInputError("Conference not found!");
+		if (!section) throw new UserInputError("Section not found!");
+
+		return { conference, section };
 	});
 }

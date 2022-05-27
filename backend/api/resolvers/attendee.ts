@@ -21,7 +21,7 @@ import { AttendeeInput, InvoiceInput } from "./types/attendee";
 
 import { Context } from "../util/auth";
 import { VerifiedTicket } from "../util/types";
-import { CheckTicket } from "../util/validation";
+import { CheckTicket } from "../util/decorators";
 import { sendMail } from "../util/mail";
 
 import env from "dotenv";
@@ -120,8 +120,6 @@ export class AttendeeResolver {
 		for (const [key, value] of Object.entries(invoiceInput)) {
 			attendee.invoice[key as keyof InvoiceInput] = value;
 		}
-
-		sendMail;
 
 		return attendee.save();
 	}

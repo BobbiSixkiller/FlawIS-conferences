@@ -44,20 +44,6 @@ input AttendeeInput {
   ticketId: ObjectId!
 }
 
-input AuthorInput {
-  id: ObjectId!
-}
-
-"""Input type for requesting co-authors of the submission"""
-input AuthorRequest {
-  coAuthors: [CoAuthorInput!]!
-  conferenceId: ObjectId!
-  conferenceName: String!
-  sectionName: String!
-  submissionId: ObjectId!
-  submissionName: String!
-}
-
 """Billing information"""
 type Billing {
   DIC: String!
@@ -78,10 +64,6 @@ input BillingInput {
   SWIFT: String
   address: AddressInput!
   name: String!
-}
-
-input CoAuthorInput {
-  email: String!
 }
 
 """Conference model type"""
@@ -194,14 +176,12 @@ input LanguageInput {
 
 type Mutation {
   addAttendee(data: AttendeeInput!): Attendee!
-  addCoAuthor(id: ObjectId!): Submission!
   addSubmission(data: SubmissionInput!): Submission!
   createConference(data: ConferenceInput!): Conference!
   createSection(data: SectionInput!): Section!
   deleteSection(id: ObjectId!): Boolean!
   deleteSubmission(id: ObjectId!): Boolean!
   removeAttendee(id: ObjectId!): Boolean!
-  requestCoAuthor(data: AuthorRequest!): Boolean!
   updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): Attendee!
   updateSection(data: SectionInput!, id: ObjectId!): Section!
@@ -265,11 +245,11 @@ type Submission {
 """Submission entity model type"""
 input SubmissionInput {
   abstract: String!
-  authors: [AuthorInput!]
-  conference: ObjectId
+  authors: [String!]
+  conferenceId: ObjectId
   keywords: [KeywordInput!]!
   name: String!
-  section: ObjectId
+  sectionId: ObjectId
   status: Status
   submissionUrl: String
 }

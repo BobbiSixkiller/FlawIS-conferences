@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { Conference, Ticket } from "../entitites/Conference";
+import { Section } from "../entitites/Section";
 
 export type Ref<T> = T | ObjectId;
 
@@ -14,4 +15,9 @@ export type User = {
 export type VerifiedTicket = {
 	ticket: Ticket;
 	conference: Conference;
+};
+
+export type ConferenceSection = {
+	conference: Conference;
+	section: Section;
 };

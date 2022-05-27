@@ -15,8 +15,10 @@ import { Section } from "../entitites/Section";
 import { Submission } from "../entitites/Submission";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context, signJwt } from "../util/auth";
+import { CheckConferenceSection } from "../util/decorators";
 import { sendMail } from "../util/mail";
-import { AuthorRequest, SubmissionInput } from "./types/submission";
+import { ConferenceSection } from "../util/types";
+import { SubmissionInput } from "./types/submission";
 
 @Service()
 @Resolver(() => Submission)
@@ -39,12 +41,44 @@ export class SubmissionResolver {
 	@Mutation(() => Submission)
 	async addSubmission(
 		@Arg("data") data: SubmissionInput,
+		@CheckConferenceSection() { conference, section }: ConferenceSection,
 		@Ctx() { user }: Context
 	): Promise<Submission> {
-		return await this.submissionService.create({
+		const submission = await this.submissionService.create({
 			...data,
+			conference: conference.id,
+			section: section.id,
 			authors: [{ id: user!.id }],
 		});
+
+		if (data.authors) {
+			const token = signJwt(
+				{ submissionId: submission.id, conferenceId: conference.id },
+				{ expiresIn: "7d" }
+			);
+
+			sendMail(
+				data.authors,
+				conference.name,
+				`You've been added to authors list of the submission: ${
+					submission.name
+				} uploaded by ${user!.name} to section "${section.name}" of the ${
+					conference.name
+				} conference.\n\nPlease copy following link to your browser:\n\n${token}\n\nBest regards,\n\n${
+					conference.name
+				} team`,
+				`<html><head></head><body><p>You've been added to authors list of the submission: ${
+					submission.name
+				} uploaded by ${user!.name} to section "${section.name}" of the ${
+					conference.name
+				} conference.</p><p>If you wish to participate please click on the following <a>link ${token}</a></p><p>Best regards,</p><p>${
+					conference.name
+				} team</p></body></html>`,
+				[]
+			);
+		}
+
+		return submission;
 	}
 
 	@Mutation(() => Submission)
@@ -60,36 +94,6 @@ export class SubmissionResolver {
 		}
 
 		return await submission.save();
-	}
-
-	@Mutation(() => Boolean)
-	async requestCoAuthor(
-		@Arg("data")
-		{
-			coAuthors,
-			submissionId,
-			conferenceId,
-			conferenceName,
-			sectionName,
-			submissionName,
-		}: AuthorRequest,
-		@Ctx() { user }: Context
-	): Promise<boolean> {
-		const token = signJwt({ submissionId, conferenceId }, { expiresIn: "7d" });
-
-		sendMail(
-			coAuthors.map((i) => i.email),
-			conferenceName,
-			`You've been added to authors list of the submission: ${submissionName} uploaded by ${
-				user!.name
-			} to section "${sectionName}" of the ${conferenceName} conference.\n\nPlease copy following link to your browser:\n\n${token}\n\nBest regards,\n\n${conferenceName} team`,
-			`<html><head></head><body><p>You've been added to authors list of the submission: ${submissionName} uploaded by ${
-				user!.name
-			} to section "${sectionName}" of the ${conferenceName} conference.</p><p>If you wish to participate please click on the following <a>link ${token}</a></p><p>Best regards,</p><p>${conferenceName} team</p></body></html>`,
-			[]
-		);
-
-		return true;
 	}
 
 	@Mutation(() => Boolean)
