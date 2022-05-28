@@ -14,6 +14,21 @@ export class Language {
 	code: string;
 }
 
+@ObjectType()
+export class Translation {
+	@Field()
+	@Property()
+	language: string;
+
+	@Field()
+	@Property()
+	name: string;
+
+	@Field()
+	@Property()
+	description: string;
+}
+
 @ObjectType({ description: "Conference's section entity model type" })
 export class Section extends TimeStamps {
 	@Field()
@@ -30,6 +45,10 @@ export class Section extends TimeStamps {
 	@Field()
 	@Property()
 	description: string;
+
+	@Field(() => [Translation])
+	@Property({ type: () => Translation, _id: false })
+	translations: Translation[];
 
 	@Field(() => [Language])
 	@Property({ type: () => [Language], _id: false })

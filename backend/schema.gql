@@ -209,6 +209,7 @@ type Section {
   languages: [Language!]!
   name: String!
   submissions: [Submission!]!
+  translations: [Translation!]!
   updatedAt: DateTime!
 }
 
@@ -218,6 +219,7 @@ input SectionInput {
   description: String!
   languages: [LanguageInput!]!
   name: String!
+  translations: [TranslationInput!]!
 }
 
 """The submissions's review process status"""
@@ -270,6 +272,18 @@ input TicketInput {
   online: Boolean!
   price: Int!
   withSubmission: Boolean!
+}
+
+type Translation {
+  description: String!
+  language: String!
+  name: String!
+}
+
+input TranslationInput {
+  description: String!
+  language: String!
+  name: String!
 }
 
 """User reference type from users microservice"""
