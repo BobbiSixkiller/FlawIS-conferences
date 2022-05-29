@@ -2,6 +2,7 @@ import { UserInputError } from "apollo-server";
 import { ObjectId } from "mongodb";
 import {
 	Arg,
+	Ctx,
 	FieldResolver,
 	Mutation,
 	Query,
@@ -12,7 +13,9 @@ import { Service } from "typedi";
 import { Section } from "../entitites/Section";
 import { Submission } from "../entitites/Submission";
 import { CRUDservice } from "../services/CRUDservice";
+import { Context } from "../util/auth";
 import { ObjectIdScalar } from "../util/scalars";
+import { localize } from "../util/typegoose-middleware";
 import { SectionInput } from "./types/section";
 
 @Service()
@@ -35,9 +38,10 @@ export class SectionResolver {
 
 	@Mutation(() => Section)
 	async createSection(
-		@Arg("data") sectionInput: SectionInput
+		@Arg("data") sectionInput: SectionInput,
+		@Ctx() { locale }: Context
 	): Promise<Section> {
-		return await this.sectionService.create(sectionInput);
+		return await this.sectionService.create(localize(sectionInput, locale));
 	}
 
 	@Mutation(() => Section)

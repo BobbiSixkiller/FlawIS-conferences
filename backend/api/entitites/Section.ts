@@ -14,12 +14,15 @@ export class Language {
 	code: string;
 }
 
-@ObjectType()
+@ObjectType({ isAbstract: true })
 export class Translation {
 	@Field()
 	@Property()
 	language: string;
+}
 
+@ObjectType()
+export class SectionTranslation extends Translation {
 	@Field()
 	@Property()
 	name: string;
@@ -46,9 +49,9 @@ export class Section extends TimeStamps {
 	@Property()
 	description: string;
 
-	@Field(() => [Translation])
-	@Property({ type: () => Translation, _id: false })
-	translations: Translation[];
+	@Field(() => [SectionTranslation])
+	@Property({ type: () => SectionTranslation, _id: false })
+	translations: SectionTranslation[];
 
 	@Field(() => [Language])
 	@Property({ type: () => [Language], _id: false })

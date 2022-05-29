@@ -7,12 +7,11 @@ import { User } from "./types";
 
 env.config();
 
-
-
 export interface Context {
 	req: Request;
 	res: Response;
 	user: User | null;
+	locale: string;
 }
 
 export function signJwt(object: Object, options?: SignOptions | undefined) {

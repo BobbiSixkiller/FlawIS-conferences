@@ -209,7 +209,7 @@ type Section {
   languages: [Language!]!
   name: String!
   submissions: [Submission!]!
-  translations: [Translation!]!
+  translations: [SectionTranslation!]!
   updatedAt: DateTime!
 }
 
@@ -220,6 +220,12 @@ input SectionInput {
   languages: [LanguageInput!]!
   name: String!
   translations: [TranslationInput!]!
+}
+
+type SectionTranslation {
+  description: String!
+  language: String!
+  name: String!
 }
 
 """The submissions's review process status"""
@@ -272,12 +278,6 @@ input TicketInput {
   online: Boolean!
   price: Int!
   withSubmission: Boolean!
-}
-
-type Translation {
-  description: String!
-  language: String!
-  name: String!
 }
 
 input TranslationInput {
