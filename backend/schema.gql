@@ -80,6 +80,7 @@ type Conference {
   sections: [Section!]!
   start: DateTime
   tickets: [Ticket!]!
+  translations: [ConferenceTranslation!]!
   updatedAt: DateTime!
   variableSymbol: String!
   venue: Venue
@@ -93,9 +94,26 @@ input ConferenceInput {
   name: String!
   regStart: DateTime
   start: DateTime
-  tickets: TicketInput
+  tickets: [TicketInput!]
+  translations: [ConferenceInputTranslation!]
   variableSymbol: String!
   venue: VenueInput
+}
+
+input ConferenceInputTranslation {
+  description: String!
+  language: String!
+  logoUrl: String!
+  name: String!
+  tickets: [TicketInputTranslation!]
+}
+
+type ConferenceTranslation {
+  description: String!
+  language: String!
+  logoUrl: String!
+  name: String!
+  tickets: [TicketTranslation!]!
 }
 
 """
@@ -164,16 +182,6 @@ input KeywordInput {
   keyword: String!
 }
 
-"""Language code"""
-type Language {
-  code: String!
-}
-
-"""Language input"""
-input LanguageInput {
-  code: String!
-}
-
 type Mutation {
   addAttendee(data: AttendeeInput!): Attendee!
   addSubmission(data: SubmissionInput!): Submission!
@@ -206,7 +214,7 @@ type Section {
   createdAt: DateTime!
   description: String!
   id: ObjectId!
-  languages: [Language!]!
+  languages: [String!]!
   name: String!
   submissions: [Submission!]!
   translations: [SectionTranslation!]!
@@ -217,7 +225,7 @@ type Section {
 input SectionInput {
   conference: String!
   description: String!
-  languages: [LanguageInput!]!
+  languages: [String!]!
   name: String!
   translations: [TranslationInput!]!
 }
@@ -278,6 +286,18 @@ input TicketInput {
   online: Boolean!
   price: Int!
   withSubmission: Boolean!
+}
+
+input TicketInputTranslation {
+  description: String!
+  language: String!
+  name: String!
+}
+
+type TicketTranslation {
+  description: String!
+  language: String!
+  name: String!
 }
 
 input TranslationInput {

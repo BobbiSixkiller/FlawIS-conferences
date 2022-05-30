@@ -7,13 +7,6 @@ import { Ref } from "../util/types";
 import { Conference } from "./Conference";
 import { Submission } from "./Submission";
 
-@ObjectType({ description: "Language code" })
-export class Language {
-	@Field()
-	@Property()
-	code: string;
-}
-
 @ObjectType({ isAbstract: true })
 export class Translation {
 	@Field()
@@ -22,7 +15,7 @@ export class Translation {
 }
 
 @ObjectType()
-export class SectionTranslation extends Translation {
+class SectionTranslation extends Translation {
 	@Field()
 	@Property()
 	name: string;
@@ -53,9 +46,9 @@ export class Section extends TimeStamps {
 	@Property({ type: () => SectionTranslation, _id: false })
 	translations: SectionTranslation[];
 
-	@Field(() => [Language])
-	@Property({ type: () => [Language], _id: false })
-	languages: Language[];
+	@Field(() => [String])
+	@Property({ type: () => String })
+	languages: string[];
 
 	@Field(() => [Submission])
 	submissions: Submission[];

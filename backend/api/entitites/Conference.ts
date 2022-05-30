@@ -3,8 +3,38 @@ import { prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
-import { Section } from "./Section";
+import { Section, Translation } from "./Section";
 import { Attendee } from "./Attendee";
+
+@ObjectType()
+class TicketTranslation extends Translation implements Partial<Ticket> {
+	@Field()
+	@Property()
+	name: string;
+
+	@Field()
+	@Property()
+	description: string;
+}
+
+@ObjectType()
+class ConferenceTranslation extends Translation {
+	@Field()
+	@Property()
+	name: string;
+
+	@Field()
+	@Property()
+	description: string;
+
+	@Field()
+	@Property()
+	logoUrl: string;
+
+	@Field(() => [TicketTranslation])
+	@Property({ type: () => TicketTranslation, default: [], _id: false })
+	tickets: TicketTranslation[];
+}
 
 @ObjectType()
 export class Address {
@@ -161,6 +191,10 @@ export class Conference extends TimeStamps {
 
 	@Field(() => [Attendee])
 	attendees: Attendee[];
+
+	@Field(() => [ConferenceTranslation])
+	@Property({ type: () => ConferenceTranslation, default: [], _id: false })
+	translations: ConferenceTranslation[];
 
 	@Field()
 	createdAt: Date;

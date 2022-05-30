@@ -2,14 +2,7 @@ import { Field, InputType } from "type-graphql";
 import { IsLocale, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 
-import { Language, Section, Translation } from "../../entitites/Section";
-
-@InputType({ description: "Language input" })
-class LanguageInput implements Language {
-	@Field()
-	@IsLocale()
-	code: string;
-}
+import { Section, Translation } from "../../entitites/Section";
 
 @InputType()
 class TranslationInput implements Translation {
@@ -36,8 +29,9 @@ export class SectionInput implements Partial<Section> {
 	@Field(() => [TranslationInput])
 	translations: TranslationInput[];
 
-	@Field(() => [LanguageInput])
-	languages: LanguageInput[];
+	@Field(() => [String])
+	@IsLocale({ each: true })
+	languages: string[];
 
 	@Field(() => String)
 	@IsString()

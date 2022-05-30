@@ -22,18 +22,22 @@ export const TypegooseMiddleware: MiddlewareFn = async ({ context }, next) => {
 	return result;
 };
 
-function transformIds(doc: object) {
+function transformIds(doc: object, locale: string) {
 	const transformed = [];
 
 	for (let [key, value] of Object.entries(doc)) {
 		if (key === "_id") key = "id";
 
 		if (typeof value === "object" && value?.hasOwnProperty("_id")) {
-			value = transformIds(value);
+			value = transformIds(value, locale);
 		}
 
-		if (typeof value === "object" && Array.isArray(value)) {
-			value = value.map((v) => transformIds(v));
+		if (
+			typeof value === "object" &&
+			Array.isArray(value) &&
+			!value.every((i) => typeof i === "string")
+		) {
+			value = value.map((v) => transformIds(v, locale));
 		}
 
 		transformed.push([key, value]);
@@ -52,11 +56,15 @@ export function localize(data: any, locale: string): any {
 		);
 		if (translation) {
 			for (const [key, value] of Object.entries(translation)) {
-				//transform the data based on context locale
-				const temp = data[key];
+				if (Array.isArray(value)) {
+					localize(value, locale);
+				} else {
+					//transform the data based on context locale
+					const temp = data[key];
 
-				data[key] = value;
-				translation[key] = temp;
+					data[key] = value;
+					translation[key] = temp;
+				}
 			}
 
 			translation.language = "en";
@@ -67,10 +75,14 @@ export function localize(data: any, locale: string): any {
 			);
 
 			for (const [key, value] of Object.entries(english)) {
-				const temp = data[key];
+				if (Array.isArray(value)) {
+					localize(value, locale);
+				} else {
+					const temp = data[key];
 
-				data[key] = value;
-				english[key] = temp;
+					data[key] = value;
+					english[key] = temp;
+				}
 			}
 
 			english.language = locale;
@@ -81,8 +93,11 @@ export function localize(data: any, locale: string): any {
 }
 
 function convertDocument(doc: Document, locale: string) {
-	const convertedDocument = transformIds(doc.toObject());
+	const convertedDocument = transformIds(doc.toObject(), locale);
+	console.log(convertedDocument);
 	localize(convertedDocument, locale);
+	console.log(convertedDocument);
+
 	const DocumentClass = getClassForDocument(doc)!;
 	Object.setPrototypeOf(convertedDocument, DocumentClass.prototype);
 	return convertedDocument;

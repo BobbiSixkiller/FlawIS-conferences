@@ -1,5 +1,11 @@
 import { Field, InputType, Int } from "type-graphql";
-import { IsBoolean, IsDate, IsNumberString, IsString } from "class-validator";
+import {
+	IsBoolean,
+	IsDate,
+	IsLocale,
+	IsNumberString,
+	IsString,
+} from "class-validator";
 
 import {
 	Address,
@@ -8,6 +14,44 @@ import {
 	Ticket,
 	Venue,
 } from "../../entitites/Conference";
+import { Translation } from "../../entitites/Section";
+
+@InputType()
+class TicketInputTranslation implements Translation {
+	@Field()
+	@IsLocale()
+	language: string;
+
+	@Field()
+	@IsString()
+	name: string;
+
+	@Field()
+	@IsString()
+	description: string;
+}
+
+@InputType()
+class ConferenceInputTranslation implements Translation {
+	@Field()
+	@IsLocale()
+	language: string;
+
+	@Field()
+	@IsString()
+	name: string;
+
+	@Field()
+	@IsString()
+	description: string;
+
+	@Field()
+	@IsString()
+	logoUrl: string;
+
+	@Field(() => [TicketInputTranslation], { nullable: true })
+	tickets?: TicketInputTranslation[];
+}
 
 @InputType()
 class AddressInput implements Address {
@@ -141,6 +185,9 @@ export class ConferenceInput {
 	@Field(() => VenueInput, { nullable: true })
 	venue?: VenueInput;
 
-	@Field(() => TicketInput, { nullable: true })
+	@Field(() => [TicketInput], { nullable: true })
 	tickets?: TicketInput[];
+
+	@Field(() => [ConferenceInputTranslation], { nullable: true })
+	translations?: ConferenceInputTranslation[];
 }
