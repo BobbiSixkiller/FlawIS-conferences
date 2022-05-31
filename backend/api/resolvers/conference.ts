@@ -16,6 +16,7 @@ import { Conference } from "../entitites/Conference";
 import { Section } from "../entitites/Section";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
+import { localizeInput } from "../util/locale";
 import { ObjectIdScalar } from "../util/scalars";
 import { ConferenceInput } from "./types/conference";
 
@@ -53,21 +54,27 @@ export class ConferenceResolver {
 	@Authorized()
 	@Mutation(() => Conference)
 	async createConference(
-		@Arg("data") conferenceInput: ConferenceInput
+		@Arg("data") conferenceInput: ConferenceInput,
+		@Ctx() { locale }: Context
 	): Promise<Conference> {
-		return await this.conferenceService.create(conferenceInput);
+		return await this.conferenceService.create(
+			localizeInput(conferenceInput, conferenceInput.translations, locale)
+		);
 	}
 
 	@Authorized()
 	@Mutation(() => Conference)
 	async updateConference(
 		@Arg("id", () => ObjectIdScalar) id: ObjectId,
-		@Arg("data") conferenceInput: ConferenceInput
+		@Arg("data") conferenceInput: ConferenceInput,
+		@Ctx() { locale }: Context
 	) {
 		const conference = await this.conferenceService.findOne({ _id: id });
 		if (!conference) throw new UserInputError("Conference not found!");
 
-		for (const [key, value] of Object.entries(conferenceInput)) {
+		for (const [key, value] of Object.entries(
+			localizeInput(conferenceInput, conferenceInput.translations, locale)
+		)) {
 			conference[key as keyof Conference] = value;
 		}
 

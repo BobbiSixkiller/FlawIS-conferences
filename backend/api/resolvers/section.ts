@@ -14,8 +14,8 @@ import { Section } from "../entitites/Section";
 import { Submission } from "../entitites/Submission";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
+import { localizeInput } from "../util/locale";
 import { ObjectIdScalar } from "../util/scalars";
-import { localize } from "../util/typegoose-middleware";
 import { SectionInput } from "./types/section";
 
 @Service()
@@ -41,18 +41,23 @@ export class SectionResolver {
 		@Arg("data") sectionInput: SectionInput,
 		@Ctx() { locale }: Context
 	): Promise<Section> {
-		return await this.sectionService.create(localize(sectionInput, locale));
+		return await this.sectionService.create(
+			localizeInput(sectionInput, sectionInput.translations, locale)
+		);
 	}
 
 	@Mutation(() => Section)
 	async updateSection(
 		@Arg("id") id: ObjectId,
-		@Arg("data") sectionInput: SectionInput
+		@Arg("data") sectionInput: SectionInput,
+		@Ctx() { locale }: Context
 	) {
 		const section = await this.sectionService.findOne({ _id: id });
 		if (!section) throw new UserInputError("Conference section not found!");
 
-		for (const [key, value] of Object.entries(sectionInput)) {
+		for (const [key, value] of Object.entries(
+			localizeInput(sectionInput, sectionInput.translations, locale)
+		)) {
 			section[key as keyof Section] = value;
 		}
 
