@@ -2,6 +2,7 @@ import { prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
 import { Directive, Field, Int, ObjectType } from "type-graphql";
+import CreateConnection from "../resolvers/types/pagination";
 
 import { Ref } from "../util/types";
 
@@ -105,3 +106,8 @@ export class Attendee extends TimeStamps {
 	@Field()
 	updatedAt: Date;
 }
+
+@ObjectType({
+	description: "AttendeeConnection type enabling cursor based pagination",
+})
+export class AttendeeConnection extends CreateConnection(Attendee) {}

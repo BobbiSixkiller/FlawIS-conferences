@@ -1,5 +1,6 @@
 import {
 	Arg,
+	Args,
 	Authorized,
 	Ctx,
 	FieldResolver,
@@ -14,10 +15,10 @@ import { Service } from "typedi";
 import fs from "fs";
 import { CRUDservice } from "../services/CRUDservice";
 
-import { Attendee } from "../entitites/Attendee";
+import { Attendee, AttendeeConnection } from "../entitites/Attendee";
 import { Conference } from "../entitites/Conference";
 import { Submission } from "../entitites/Submission";
-import { AttendeeInput, InvoiceInput } from "./types/attendee";
+import { AttendeeArgs, AttendeeInput, InvoiceInput } from "./types/attendee";
 
 import { Context } from "../util/auth";
 import { VerifiedTicket } from "../util/types";
@@ -38,9 +39,39 @@ export class AttendeeResolver {
 		private readonly submissionService = new CRUDservice(Submission)
 	) {}
 
-	@Query(() => [Attendee])
-	async attendees(): Promise<Attendee[]> {
-		return await this.attendeeService.findAll({});
+	@Query(() => AttendeeConnection)
+	async attendees(
+		@Args() { after, first, before, last }: AttendeeArgs
+	): Promise<AttendeeConnection> {
+		const attendees = await this.attendeeService.findAll(
+			{
+				_id: after ? { $lt: after } : { $gt: before },
+			},
+			{},
+			{ sort: { _id: -1 }, limit: after ? first : last }
+		);
+
+		const [hasNextPage, hasPreviousPage] = await Promise.all([
+			this.attendeeService.exists({
+				_id: { $lt: attendees[0].id },
+			}),
+			this.attendeeService.exists({
+				_id: { $gt: attendees[attendees.length].id },
+			}),
+		]);
+
+		return {
+			edges: attendees.map((attendee) => ({
+				cursor: attendee.id,
+				node: attendee,
+			})),
+			pageInfo: {
+				startCursor: attendees[0].id,
+				hasPreviousPage: hasPreviousPage !== null,
+				endCursor: attendees[attendees.length].id,
+				hasNextPage: hasNextPage !== null,
+			},
+		};
 	}
 
 	//Refactor to check for co-author header and run a submission update to push new coauthor into the authors array

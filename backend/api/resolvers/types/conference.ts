@@ -14,10 +14,9 @@ import {
 	Ticket,
 	Venue,
 } from "../../entitites/Conference";
-import { Translation } from "../../entitites/Section";
 
 @InputType()
-class TicketInputTranslation implements Translation {
+class TicketInputTranslation {
 	@Field()
 	@IsLocale()
 	language: string;
@@ -32,7 +31,7 @@ class TicketInputTranslation implements Translation {
 }
 
 @InputType()
-class ConferenceInputTranslation implements Translation {
+class ConferenceInputTranslation {
 	@Field()
 	@IsLocale()
 	language: string;

@@ -24,23 +24,26 @@ env.config();
 
 async function main() {
 	//Build schema
-	const schema = await buildFederatedSchema({
-		resolvers: [
-			ConferenceResolver,
-			SectionResolver,
-			SubmissionResolver,
-			AttendeeResolver,
-		],
-		// use document converting middleware
-		globalMiddlewares: [TypegooseMiddleware],
-		// use ObjectId scalar mapping
-		scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
-		emitSchemaFile: true,
-		container: Container,
-		//disabled validation for dev purposes
-		//validate: false,
-		authChecker,
-	});
+	const schema = await buildFederatedSchema(
+		{
+			resolvers: [
+				ConferenceResolver,
+				SectionResolver,
+				SubmissionResolver,
+				AttendeeResolver,
+			],
+			// use document converting middleware
+			globalMiddlewares: [TypegooseMiddleware],
+			// use ObjectId scalar mapping
+			scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
+			emitSchemaFile: true,
+			container: Container,
+			//disabled validation for dev purposes
+			//validate: false,
+			authChecker,
+		},
+		{}
+	);
 
 	//Create Apollo server
 	const server = new ApolloServer({

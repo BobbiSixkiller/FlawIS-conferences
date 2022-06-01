@@ -3,16 +3,6 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
-directive @extends on INTERFACE | OBJECT
-
-directive @external on FIELD_DEFINITION | OBJECT
-
-directive @key(fields: String!) on INTERFACE | OBJECT
-
-directive @provides(fields: String!) on FIELD_DEFINITION
-
-directive @requires(fields: String!) on FIELD_DEFINITION
-
 type Address {
   city: String!
   country: String!
@@ -36,6 +26,17 @@ type Attendee {
   submissions: [Submission!]!
   updatedAt: DateTime!
   user: User!
+}
+
+"""AttendeeConnection type enabling cursor based pagination"""
+type AttendeeConnection {
+  edges: [AttendeeEdge!]!
+  pageInfo: PageInfo!
+}
+
+type AttendeeEdge {
+  cursor: ObjectId!
+  node: Attendee!
 }
 
 input AttendeeInput {
@@ -173,15 +174,6 @@ input InvoiceInput {
   payer: BillingInput
 }
 
-"""Keyword"""
-type Keyword {
-  keyword: String!
-}
-
-input KeywordInput {
-  keyword: String!
-}
-
 type Mutation {
   addAttendee(data: AttendeeInput!): Attendee!
   addSubmission(data: SubmissionInput!): Submission!
@@ -199,8 +191,15 @@ type Mutation {
 """Mongo object id scalar type"""
 scalar ObjectId
 
+type PageInfo {
+  endCursor: ObjectId!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: ObjectId!
+}
+
 type Query {
-  attendees: [Attendee!]!
+  attendees(after: String, before: String, first: Int = 20, last: Int = 20): AttendeeConnection!
   conference(id: ObjectId!): Conference!
   conferences: [Conference!]!
   section(id: ObjectId!): Section!
@@ -250,24 +249,39 @@ type Submission {
   conference: Conference!
   createdAt: DateTime!
   id: ObjectId!
-  keywords: [Keyword!]!
+  keywords: [String!]!
   name: String!
   section: Section!
   status: Status!
   submissionUrl: String
+  translations: [SubmissionTranslation!]!
   updatedAt: DateTime!
 }
 
-"""Submission entity model type"""
 input SubmissionInput {
   abstract: String!
   authors: [String!]
   conferenceId: ObjectId
-  keywords: [KeywordInput!]!
+  keywords: [String!]!
   name: String!
   sectionId: ObjectId
   status: Status
   submissionUrl: String
+  translations: [SubmissionInputTranslation!]!
+}
+
+input SubmissionInputTranslation {
+  abstract: String!
+  keywords: [String!]!
+  language: String!
+  name: String!
+}
+
+type SubmissionTranslation {
+  abstract: String!
+  keywords: [String!]!
+  language: String!
+  name: String!
 }
 
 """Conference ticket type"""

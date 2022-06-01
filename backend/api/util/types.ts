@@ -21,3 +21,7 @@ export type ConferenceSection = {
 	conference: Conference;
 	section: Section;
 };
+
+export type Translation = {
+	language: string;
+};

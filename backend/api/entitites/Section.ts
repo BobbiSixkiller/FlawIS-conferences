@@ -8,7 +8,7 @@ import { Conference } from "./Conference";
 import { Submission } from "./Submission";
 
 @ObjectType({ isAbstract: true })
-export class Translation {
+class Translation {
 	@Field()
 	@Property()
 	language: string;

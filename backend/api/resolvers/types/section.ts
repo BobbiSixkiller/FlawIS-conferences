@@ -2,10 +2,10 @@ import { Field, InputType } from "type-graphql";
 import { IsLocale, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 
-import { Section, Translation } from "../../entitites/Section";
+import { Section } from "../../entitites/Section";
 
 @InputType()
-class TranslationInput implements Translation {
+class TranslationInput {
 	@Field()
 	language: string;
 

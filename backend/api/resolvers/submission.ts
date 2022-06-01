@@ -16,6 +16,7 @@ import { Submission } from "../entitites/Submission";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context, signJwt } from "../util/auth";
 import { CheckConferenceSection } from "../util/decorators";
+import { localizeInput } from "../util/locale";
 import { sendMail } from "../util/mail";
 import { ConferenceSection } from "../util/types";
 import { SubmissionInput } from "./types/submission";
@@ -42,10 +43,10 @@ export class SubmissionResolver {
 	async addSubmission(
 		@Arg("data") data: SubmissionInput,
 		@CheckConferenceSection() { conference, section }: ConferenceSection,
-		@Ctx() { user }: Context
+		@Ctx() { user, locale }: Context
 	): Promise<Submission> {
 		const submission = await this.submissionService.create({
-			...data,
+			...localizeInput(data, data.translations, locale),
 			conference: conference.id,
 			section: section.id,
 			authors: [{ id: user!.id }],
@@ -84,12 +85,15 @@ export class SubmissionResolver {
 	@Mutation(() => Submission)
 	async updateSubmission(
 		@Arg("id") id: ObjectId,
-		@Arg("data") data: SubmissionInput
+		@Arg("data") data: SubmissionInput,
+		@Ctx() { locale }: Context
 	): Promise<Submission> {
 		const submission = await this.submissionService.findOne({ _id: id });
 		if (!submission) throw new Error("Submission not found!");
 
-		for (const [key, value] of Object.entries(data)) {
+		for (const [key, value] of Object.entries(
+			localizeInput(data, data.translations, locale)
+		)) {
 			submission[key as keyof Submission] = value;
 		}
 

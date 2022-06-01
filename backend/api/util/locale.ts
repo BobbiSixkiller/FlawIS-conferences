@@ -1,4 +1,4 @@
-import { Translation } from "../entitites/Section";
+import { Translation } from "./types";
 
 export function localizeOutput(
 	data: any,

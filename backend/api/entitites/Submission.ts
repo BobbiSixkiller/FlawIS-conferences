@@ -24,11 +24,26 @@ registerEnumType(Status, {
 	description: "The submissions's review process status", // this one is optional
 });
 
-@ObjectType({ description: "Keyword" })
-export class Keyword {
+@ObjectType({ isAbstract: true })
+class Translation {
 	@Field()
 	@Property()
-	keyword: string;
+	language: string;
+}
+
+@ObjectType()
+class SubmissionTranslation extends Translation implements Partial<Submission> {
+	@Field()
+	@Property()
+	name: string;
+
+	@Field()
+	@Property()
+	abstract: string;
+
+	@Field(() => [String])
+	@Property({ type: () => String })
+	keywords: string[];
 }
 
 @pre<Submission>("save", async function () {
@@ -46,7 +61,7 @@ export class Keyword {
 					value: this.name, // Value that haven't pass a validation.
 					constraints: {
 						// Constraints that failed validation with error messages.
-						EmailExists: "Submission with provided name already exists!",
+						nameExists: "Submission with provided name already exists!",
 					},
 					//children?: ValidationError[], // Contains all nested validation errors of the property
 				},
@@ -66,9 +81,9 @@ export class Submission extends TimeStamps {
 	@Property()
 	abstract: string;
 
-	@Field(() => [Keyword])
-	@Property({ type: () => Keyword })
-	keywords: Keyword[];
+	@Field(() => [String])
+	@Property({ type: () => String })
+	keywords: string[];
 
 	@Field({ nullable: true })
 	@Property()
@@ -89,6 +104,10 @@ export class Submission extends TimeStamps {
 	@Field(() => Status)
 	@Property({ default: "REVIEWING" })
 	status: Status;
+
+	@Field(() => [SubmissionTranslation])
+	@Property({ type: () => SubmissionTranslation, _id: false })
+	translations: SubmissionTranslation[];
 
 	@Field()
 	createdAt: Date;

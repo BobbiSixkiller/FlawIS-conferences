@@ -1,25 +1,56 @@
-import { IsEmail } from "class-validator";
+import {
+	ArrayMinSize,
+	IsEmail,
+	IsLocale,
+	IsMongoId,
+	IsUrl,
+	MaxLength,
+} from "class-validator";
 import { ObjectId } from "mongodb";
 import { Authorized, Field, InputType } from "type-graphql";
 
 import { Status } from "../../entitites/Submission";
 
 @InputType()
-class KeywordInput {
+class SubmissionInputTranslation {
 	@Field()
-	keyword: string;
-}
+	@IsLocale()
+	language: string;
 
-@InputType({ description: "Submission entity model type" })
-export class SubmissionInput {
 	@Field()
+	@MaxLength(250, { message: "Submission name can have max 250 characters!" })
 	name: string;
 
 	@Field()
+	@MaxLength(1000, { message: "Submission name can have max 1000 characters!" })
 	abstract: string;
 
-	@Field(() => [KeywordInput])
-	keywords: KeywordInput[];
+	@Field(() => [String])
+	@ArrayMinSize(1, { message: "You must include at least one keyword!" })
+	@MaxLength(250, {
+		message: "Keyword can have max 250 characters!",
+		each: true,
+	})
+	keywords: string[];
+}
+
+@InputType()
+export class SubmissionInput {
+	@Field()
+	@MaxLength(250, { message: "Submission name can have max 250 characters!" })
+	name: string;
+
+	@Field()
+	@MaxLength(1000, { message: "Submission name can have max 1000 characters!" })
+	abstract: string;
+
+	@Field(() => [String])
+	@ArrayMinSize(1, { message: "You must include at least one keyword!" })
+	@MaxLength(250, {
+		message: "Keyword can have max 250 characters!",
+		each: true,
+	})
+	keywords: string[];
 
 	@Field({ nullable: true })
 	conferenceId?: ObjectId;
@@ -28,6 +59,7 @@ export class SubmissionInput {
 	sectionId?: ObjectId;
 
 	@Field({ nullable: true })
+	@IsUrl()
 	submissionUrl?: string;
 
 	@Field(() => [String], { nullable: true })
@@ -37,4 +69,8 @@ export class SubmissionInput {
 	@Authorized(["ADMIN"])
 	@Field(() => Status, { nullable: true })
 	status?: Status;
+
+	@Field(() => [SubmissionInputTranslation])
+	@ArrayMinSize(1, { message: "You must include a translation!" })
+	translations: SubmissionInputTranslation[];
 }

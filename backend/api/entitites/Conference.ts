@@ -3,8 +3,15 @@ import { prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
-import { Section, Translation } from "./Section";
+import { Section } from "./Section";
 import { Attendee } from "./Attendee";
+
+@ObjectType({ isAbstract: true })
+class Translation {
+	@Field()
+	@Property()
+	language: string;
+}
 
 @ObjectType()
 class TicketTranslation extends Translation implements Partial<Ticket> {
@@ -64,6 +71,10 @@ export class Billing {
 	@Property()
 	name: string;
 
+	@Field(() => Address)
+	@Property({ _id: false })
+	address: Address;
+
 	@Field()
 	@Property()
 	ICO: string;
@@ -83,10 +94,6 @@ export class Billing {
 	@Field({ nullable: true })
 	@Property()
 	SWIFT?: string;
-
-	@Field(() => Address)
-	@Property({ _id: false })
-	address: Address;
 }
 
 @ObjectType({ description: "Conference hosting organization" })
