@@ -22,7 +22,7 @@ export const TypegooseMiddleware: MiddlewareFn = async ({ context }, next) => {
 	return result;
 };
 
-function transformIds(doc: object) {
+export function transformIds(doc: object) {
 	const transformed = [];
 
 	for (let [key, value] of Object.entries(doc)) {

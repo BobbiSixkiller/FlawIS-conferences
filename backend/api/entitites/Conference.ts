@@ -196,9 +196,6 @@ export class Conference extends TimeStamps {
 	@Property()
 	end?: Date;
 
-	@Field(() => [Attendee])
-	attendees: Attendee[];
-
 	@Field(() => [ConferenceTranslation])
 	@Property({ type: () => ConferenceTranslation, default: [], _id: false })
 	translations: ConferenceTranslation[];

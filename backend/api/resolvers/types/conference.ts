@@ -1,10 +1,12 @@
-import { Field, InputType, Int } from "type-graphql";
+import { ArgsType, Field, InputType, Int } from "type-graphql";
 import {
 	IsBoolean,
 	IsDate,
 	IsLocale,
 	IsNumberString,
 	IsString,
+	Max,
+	Min,
 } from "class-validator";
 
 import {
@@ -14,6 +16,9 @@ import {
 	Ticket,
 	Venue,
 } from "../../entitites/Conference";
+import { RefDocExists } from "../../util/decorators";
+import { Attendee } from "../../entitites/Attendee";
+import { ObjectId } from "mongodb";
 
 @InputType()
 class TicketInputTranslation {

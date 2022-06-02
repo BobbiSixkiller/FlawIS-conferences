@@ -18,7 +18,7 @@ import { CRUDservice } from "../services/CRUDservice";
 import { Attendee, AttendeeConnection } from "../entitites/Attendee";
 import { Conference } from "../entitites/Conference";
 import { Submission } from "../entitites/Submission";
-import { AttendeeArgs, AttendeeInput, InvoiceInput } from "./types/attendee";
+import { AttendeeInput, InvoiceInput } from "./types/attendee";
 
 import { Context } from "../util/auth";
 import { VerifiedTicket } from "../util/types";
@@ -39,39 +39,13 @@ export class AttendeeResolver {
 		private readonly submissionService = new CRUDservice(Submission)
 	) {}
 
-	@Query(() => AttendeeConnection)
-	async attendees(
-		@Args() { after, first, before, last }: AttendeeArgs
-	): Promise<AttendeeConnection> {
-		const attendees = await this.attendeeService.findAll(
-			{
-				_id: after ? { $lt: after } : { $gt: before },
-			},
-			{},
-			{ sort: { _id: -1 }, limit: after ? first : last }
-		);
+	@Authorized()
+	@Query(() => Attendee)
+	async attendee(@Arg("id") id: ObjectId): Promise<Attendee> {
+		const attendee = await this.attendeeService.findOne({ _id: id });
+		if (!attendee) throw new Error("Attendee not found!");
 
-		const [hasNextPage, hasPreviousPage] = await Promise.all([
-			this.attendeeService.exists({
-				_id: { $lt: attendees[0].id },
-			}),
-			this.attendeeService.exists({
-				_id: { $gt: attendees[attendees.length].id },
-			}),
-		]);
-
-		return {
-			edges: attendees.map((attendee) => ({
-				cursor: attendee.id,
-				node: attendee,
-			})),
-			pageInfo: {
-				startCursor: attendees[0].id,
-				hasPreviousPage: hasPreviousPage !== null,
-				endCursor: attendees[attendees.length].id,
-				hasNextPage: hasNextPage !== null,
-			},
-		};
+		return attendee;
 	}
 
 	//Refactor to check for co-author header and run a submission update to push new coauthor into the authors array
@@ -83,6 +57,7 @@ export class AttendeeResolver {
 		@Ctx() { user }: Context
 	): Promise<Attendee> {
 		const ticketPrice = ticket.price / Number(process.env.VAT || 1.2);
+		const isFlaw = user!.email.split("@")[1] === "flaw.uniba.sk";
 
 		const attendee = await this.attendeeService.create({
 			conference: conferenceId,
@@ -96,8 +71,10 @@ export class AttendeeResolver {
 				issuer: conference.host,
 				body: {
 					variableSymbol: conference.variableSymbol,
-					ticketPrice,
-					vat: ticket.price - ticketPrice,
+					ticketPrice: Math.round((ticketPrice / 100) * 100) / 100,
+					vat: isFlaw
+						? 0
+						: Math.round((ticket.price - ticketPrice) * 100) / 100,
 					body: "Test invoice",
 					comment:
 						"In case of not due payment the host organisation is reserving the right to cancel attendee",
@@ -155,7 +132,7 @@ export class AttendeeResolver {
 		return attendee.save();
 	}
 
-	@Authorized()
+	@Authorized(["ADMIN"])
 	@Mutation(() => Boolean)
 	async removeAttendee(@Arg("id") id: ObjectId): Promise<boolean> {
 		const { deletedCount } = await this.attendeeService.delete({ _id: id });
@@ -163,6 +140,7 @@ export class AttendeeResolver {
 		return deletedCount > 0;
 	}
 
+	@Authorized()
 	@FieldResolver(() => Conference, { nullable: true })
 	async conference(
 		@Root() { conference }: Attendee
@@ -170,6 +148,7 @@ export class AttendeeResolver {
 		return await this.conferenceService.findOne({ _id: conference });
 	}
 
+	@Authorized()
 	@FieldResolver(() => [Submission], { nullable: true })
 	async submissions(
 		@Root() { conference, user }: Attendee

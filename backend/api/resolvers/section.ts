@@ -2,6 +2,7 @@ import { UserInputError } from "apollo-server";
 import { ObjectId } from "mongodb";
 import {
 	Arg,
+	Authorized,
 	Ctx,
 	FieldResolver,
 	Mutation,
@@ -26,6 +27,7 @@ export class SectionResolver {
 		private readonly submissionService = new CRUDservice(Submission)
 	) {}
 
+	@Authorized(["ADMIN"])
 	@Query(() => Section)
 	async section(
 		@Arg("id", () => ObjectIdScalar) id: ObjectId
@@ -36,6 +38,7 @@ export class SectionResolver {
 		return section;
 	}
 
+	@Authorized(["ADMIN"])
 	@Mutation(() => Section)
 	async createSection(
 		@Arg("data") sectionInput: SectionInput,
@@ -46,6 +49,7 @@ export class SectionResolver {
 		);
 	}
 
+	@Authorized(["ADMIN"])
 	@Mutation(() => Section)
 	async updateSection(
 		@Arg("id") id: ObjectId,
@@ -64,6 +68,7 @@ export class SectionResolver {
 		return await section.save();
 	}
 
+	@Authorized(["ADMIN"])
 	@Mutation(() => Boolean)
 	async deleteSection(
 		@Arg("id", () => ObjectIdScalar) id: ObjectId
@@ -73,6 +78,7 @@ export class SectionResolver {
 		return deletedCount > 0;
 	}
 
+	@Authorized(["ADMIN"])
 	@FieldResolver(() => [Submission])
 	async submissions(@Root() { id }: Section): Promise<Submission[]> {
 		return await this.submissionService.findAll({ section: id });

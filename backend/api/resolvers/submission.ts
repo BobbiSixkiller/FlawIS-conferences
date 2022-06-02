@@ -30,6 +30,7 @@ export class SubmissionResolver {
 		private readonly sectionService = new CRUDservice(Section)
 	) {}
 
+	@Authorized()
 	@Query(() => Submission)
 	async submission(@Arg("id") id: ObjectId): Promise<Submission> {
 		const submission = await this.submissionService.findOne({ _id: id });
@@ -82,6 +83,7 @@ export class SubmissionResolver {
 		return submission;
 	}
 
+	@Authorized()
 	@Mutation(() => Submission)
 	async updateSubmission(
 		@Arg("id") id: ObjectId,
@@ -100,12 +102,14 @@ export class SubmissionResolver {
 		return await submission.save();
 	}
 
+	@Authorized()
 	@Mutation(() => Boolean)
 	async deleteSubmission(@Arg("id") id: ObjectId): Promise<boolean> {
 		const { deletedCount } = await this.submissionService.delete({ _id: id });
 		return deletedCount > 0;
 	}
 
+	@Authorized()
 	@FieldResolver(() => Conference, { nullable: true })
 	async conference(
 		@Root() { conference }: Submission
@@ -113,6 +117,7 @@ export class SubmissionResolver {
 		return await this.conferenceService.findOne({ _id: conference });
 	}
 
+	@Authorized()
 	@FieldResolver(() => Section, { nullable: true })
 	async section(@Root() { section }: Submission): Promise<Section | null> {
 		return await this.sectionService.findOne({ _id: section });

@@ -3,6 +3,16 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+directive @extends on INTERFACE | OBJECT
+
+directive @external on FIELD_DEFINITION | OBJECT
+
+directive @key(fields: String!) on INTERFACE | OBJECT
+
+directive @provides(fields: String!) on FIELD_DEFINITION
+
+directive @requires(fields: String!) on FIELD_DEFINITION
+
 type Address {
   city: String!
   country: String!
@@ -30,7 +40,7 @@ type Attendee {
 
 """AttendeeConnection type enabling cursor based pagination"""
 type AttendeeConnection {
-  edges: [AttendeeEdge!]!
+  edges: [AttendeeEdge]!
   pageInfo: PageInfo!
 }
 
@@ -69,7 +79,9 @@ input BillingInput {
 
 """Conference model type"""
 type Conference {
-  attendees: [Attendee!]!
+  attendees(after: String, before: String, first: Int = 20, last: Int = 20): AttendeeConnection!
+  attendeesCount: Int!
+  attending: Boolean!
   createdAt: DateTime!
   description: String!
   end: DateTime
@@ -199,7 +211,7 @@ type PageInfo {
 }
 
 type Query {
-  attendees(after: String, before: String, first: Int = 20, last: Int = 20): AttendeeConnection!
+  attendee(id: ObjectId!): Attendee!
   conference(id: ObjectId!): Conference!
   conferences: [Conference!]!
   section(id: ObjectId!): Section!

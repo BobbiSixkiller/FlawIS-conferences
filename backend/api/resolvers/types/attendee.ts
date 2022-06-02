@@ -6,31 +6,6 @@ import { Attendee } from "../../entitites/Attendee";
 import { RefDocExists } from "../../util/decorators";
 import { BillingInput } from "./conference";
 
-@ArgsType()
-export class AttendeeArgs {
-	@Field(() => String, { nullable: true })
-	@RefDocExists(Attendee, {
-		message: "Cursor's document not found!",
-	})
-	after?: ObjectId;
-
-	@Field(() => Int, { defaultValue: 20, nullable: true })
-	@Min(1)
-	@Max(50)
-	first?: number;
-
-	@Field(() => String, { nullable: true })
-	@RefDocExists(Attendee, {
-		message: "Cursor's document not found!",
-	})
-	before?: ObjectId;
-
-	@Field(() => Int, { defaultValue: 20, nullable: true })
-	@Min(1)
-	@Max(50)
-	last?: number;
-}
-
 @InputType()
 export class AttendeeInput {
 	@Field()
@@ -85,4 +60,29 @@ export class InvoiceInput {
 
 	@Field(() => InvoiceDataInput, { nullable: true })
 	body: InvoiceDataInput;
+}
+
+@ArgsType()
+export class AttendeeArgs {
+	@Field(() => String, { nullable: true })
+	@RefDocExists(Attendee, {
+		message: "Cursor's document not found!",
+	})
+	after?: ObjectId;
+
+	@Field(() => Int, { defaultValue: 20, nullable: true })
+	@Min(1)
+	@Max(50)
+	first?: number;
+
+	@Field(() => String, { nullable: true })
+	@RefDocExists(Attendee, {
+		message: "Cursor's document not found!",
+	})
+	before?: ObjectId;
+
+	@Field(() => Int, { defaultValue: 20, nullable: true })
+	@Min(1)
+	@Max(50)
+	last?: number;
 }

@@ -2,22 +2,27 @@ import { UserInputError } from "apollo-server";
 import { ObjectId } from "mongodb";
 import {
 	Arg,
+	Args,
 	Authorized,
 	Ctx,
+	Field,
 	FieldResolver,
+	Int,
 	Mutation,
 	Query,
 	Resolver,
 	Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Attendee } from "../entitites/Attendee";
+import { Attendee, AttendeeConnection } from "../entitites/Attendee";
 import { Conference } from "../entitites/Conference";
 import { Section } from "../entitites/Section";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
 import { localizeInput } from "../util/locale";
 import { ObjectIdScalar } from "../util/scalars";
+import { transformIds } from "../util/typegoose-middleware";
+import { AttendeeArgs } from "./types/attendee";
 import { ConferenceInput } from "./types/conference";
 
 @Service()
@@ -51,7 +56,7 @@ export class ConferenceResolver {
 		});
 	}
 
-	@Authorized()
+	@Authorized(["ADMIN"])
 	@Mutation(() => Conference)
 	async createConference(
 		@Arg("data") conferenceInput: ConferenceInput,
@@ -62,7 +67,7 @@ export class ConferenceResolver {
 		);
 	}
 
-	@Authorized()
+	@Authorized(["ADMIN"])
 	@Mutation(() => Conference)
 	async updateConference(
 		@Arg("id", () => ObjectIdScalar) id: ObjectId,
@@ -88,18 +93,81 @@ export class ConferenceResolver {
 	}
 
 	@Authorized()
-	@FieldResolver(() => [Attendee])
+	@FieldResolver(() => AttendeeConnection)
 	async attendees(
+		@Args() { after, first, before, last }: AttendeeArgs,
 		@Root() { id }: Conference,
 		@Ctx() { user }: Context
-	): Promise<Attendee[]> {
-		if (user!.role === "ADMIN" || user!.role === "SUPERVISOR") {
-			return await this.attendeeService.findAll({ conference: id });
-		} else {
-			return await this.attendeeService.findAll({
+	): Promise<AttendeeConnection> {
+		const attendees = await this.attendeeService.aggregate([
+			{
+				$match: {
+					conference: id,
+					$expr: {
+						$cond: [
+							{ $and: [{ $eq: [after, null] }, { $eq: [before, null] }] },
+							{ $ne: ["$_id", null] },
+							{
+								$cond: [
+									{ $ne: [after, null] },
+									{ $lt: ["$_id", after] },
+									{ $gt: ["$_id", before] },
+								],
+							},
+						],
+					},
+				},
+			},
+			{ $sort: { _id: -1 } },
+			{ $limit: first || last || 20 },
+		]);
+
+		const [hasNextPage, hasPreviousPage] = await Promise.all([
+			this.attendeeService.exists({
+				_id: { $gt: attendees[0]?._id },
+			}),
+			this.attendeeService.exists({
+				_id: { $lt: attendees[attendees.length - 1]?._id },
+			}),
+		]);
+
+		return {
+			edges: attendees.map((attendee) => ({
+				cursor: attendee?._id,
+				node: transformIds(attendee),
+			})),
+			pageInfo: {
+				startCursor: attendees[0]?._id,
+				hasPreviousPage: hasPreviousPage !== null,
+				endCursor: attendees[attendees.length - 1]?._id,
+				hasNextPage: hasNextPage !== null,
+			},
+		};
+	}
+
+	@Authorized()
+	@FieldResolver(() => Boolean)
+	async attending(
+		@Root() { id }: Conference,
+		@Ctx() { user }: Context
+	): Promise<boolean> {
+		return (
+			(await this.attendeeService.exists({
 				conference: id,
 				"user.id": user!.id,
-			});
-		}
+			})) !== null
+		);
+	}
+
+	@Authorized()
+	@FieldResolver(() => Int)
+	async attendeesCount(
+		@Root() { id }: Conference,
+		@Ctx() { user }: Context
+	): Promise<number> {
+		return await this.attendeeService.dataModel.countDocuments({
+			conference: id,
+			"user.id": user!.id,
+		});
 	}
 }

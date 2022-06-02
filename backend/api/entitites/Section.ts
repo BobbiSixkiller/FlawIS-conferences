@@ -1,7 +1,7 @@
 import { prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
-import { Field, ObjectType } from "type-graphql";
+import { Authorized, Field, ObjectType } from "type-graphql";
 
 import { Ref } from "../util/types";
 import { Conference } from "./Conference";
@@ -50,6 +50,7 @@ export class Section extends TimeStamps {
 	@Property({ type: () => String })
 	languages: string[];
 
+	@Authorized(["ADMIN"])
 	@Field(() => [Submission])
 	submissions: Submission[];
 

@@ -2,7 +2,7 @@ import { Translation } from "./types";
 
 export function localizeOutput(
 	data: any,
-	translations: any,
+	translations: any = [],
 	locale: string
 ): any {
 	if (locale === "en") return data;
