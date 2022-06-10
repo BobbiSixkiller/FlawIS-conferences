@@ -1,4 +1,4 @@
-import { gql, useMutation } from "../../node_modules/@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 
 const LOGIN = gql`
 	mutation login($email: String!, $password: String!) {
@@ -14,7 +14,10 @@ const LOGIN = gql`
 
 export default function Login() {
 	const [login, { loading, errors, data }] = useMutation(LOGIN, {
-		variables: { email: "", password: "" },
+		variables: {
+			email: "matus.muransky@flaw.uniba.sk",
+			password: "101010555a",
+		},
 	});
 
 	if (data || errors) {
