@@ -7,6 +7,9 @@ import {
 	Icon,
 	Segment,
 	Sidebar,
+	Header,
+	Button,
+	Ref,
 } from "semantic-ui-react";
 import { useState } from "react";
 import Image from "next/image";
@@ -22,6 +25,7 @@ interface navProps {
 }
 
 const FollowingBar = styled.div`
+	//position: fixed;
 	position: ${(props: navProps) => (props.inView ? "static" : "fixed")};
 	top: 0px;
 	z-index: 900;
@@ -42,10 +46,12 @@ const FollowingBar = styled.div`
 `;
 
 export default function Nav({ children }) {
-	const { ref, inView } = useInView();
+	const { ref, inView } = useInView({ treshold: 0.5, initialInView: true });
 	const [opened, toggle] = useState(false);
 
 	const width = useWidth();
+
+	console.log(inView);
 
 	return (
 		<Sidebar.Pushable>
@@ -71,16 +77,16 @@ export default function Nav({ children }) {
 			</Sidebar>
 
 			<Sidebar.Pusher dimmed={opened}>
+				<div ref={ref} />
 				<Segment
 					inverted
-					textAlign="center"
-					style={{
-						minHeight: 350,
-						padding: "1em 0em",
-					}}
 					vertical
+					style={{
+						padding: 0,
+						minHeight: width > 992 ? "600px" : "350px",
+						height: "auto",
+					}}
 				>
-					<div ref={ref} />
 					<FollowingBar inView={inView} width={width}>
 						<Container>
 							<Menu inverted={inView ? true : false} secondary size="large">
@@ -116,6 +122,41 @@ export default function Nav({ children }) {
 							</Menu>
 						</Container>
 					</FollowingBar>
+
+					<Container
+						text
+						style={{
+							padding: "0 0 2em 0",
+							marginTop: width > 992 ? "2.5em 0em" : "0em 0em",
+						}}
+						textAlign="center"
+					>
+						<Header
+							as="h1"
+							content="Conferences"
+							inverted
+							style={{
+								fontSize: width > 992 ? "4em" : "2em",
+								fontWeight: "normal",
+								marginBottom: 0,
+								marginTop: width > 992 ? "3em" : "1.5em",
+							}}
+						/>
+						<Header
+							as="h2"
+							content="Faculty of Law, Comenius university in Bratislava"
+							inverted
+							style={{
+								fontSize: width > 992 ? "1.7em" : "1.5em",
+								fontWeight: "normal",
+								marginTop: width > 992 ? "1.5em" : "0.5em",
+							}}
+						/>
+						<Button primary size="huge">
+							Registrovať
+							<Icon name="right arrow" />
+						</Button>
+					</Container>
 				</Segment>
 
 				{children}
