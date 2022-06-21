@@ -1,40 +1,53 @@
-import { Segment, Container, Grid, Header, List } from "semantic-ui-react";
+import Image from "next/image";
+import logo from "public/images/PraF_logo_text_BP_horizontal_inverted.png";
+
+import {
+	Segment,
+	Container,
+	Grid,
+	Header,
+	List,
+	Divider,
+} from "semantic-ui-react";
 
 export default function Footer() {
 	return (
-		<Segment inverted vertical style={{ padding: "5em 0em" }}>
-			<Container>
-				<Grid divided inverted stackable>
+		<Segment inverted style={{ padding: "5em 0em" }} vertical>
+			<Container textAlign="center">
+				<Grid>
 					<Grid.Row>
-						<Grid.Column width={3}>
-							<Header inverted as="h4" content="About" />
-							<List link inverted>
-								<List.Item as="a">Sitemap</List.Item>
-								<List.Item as="a">Contact Us</List.Item>
-								<List.Item as="a">Religious Ceremonies</List.Item>
-								<List.Item as="a">Gazebo Plans</List.Item>
-							</List>
-						</Grid.Column>
-						<Grid.Column width={3}>
-							<Header inverted as="h4" content="Services" />
-							<List link inverted>
-								<List.Item as="a">Banana Pre-Order</List.Item>
-								<List.Item as="a">DNA FAQ</List.Item>
-								<List.Item as="a">How To Access</List.Item>
-								<List.Item as="a">Favorite X-Men</List.Item>
-							</List>
-						</Grid.Column>
-						<Grid.Column width={7}>
-							<Header as="h4" inverted>
-								Footer Header
-							</Header>
+						<Grid.Column>
+							<Header inverted as="h4" content="About Conference System" />
 							<p>
-								Extra space for a call to action inside the footer that could
-								help re-engage users.
+								This system is being developed and maitained by Faculty of Law,
+								Comenius University in Bratislava. If you encounter any
+								problems, please do not hesitate to contact us!
 							</p>
 						</Grid.Column>
 					</Grid.Row>
 				</Grid>
+				<Divider inverted section />
+				<div style={{ display: "flex", justifyContent: "center" }}>
+					<Image
+						alt="flaw-logo-notext"
+						src={logo}
+						height={130}
+						width={300}
+						priority={true}
+					/>
+				</div>
+
+				<List horizontal inverted divided link size="small">
+					<List.Item as="a" href="#">
+						Site Map
+					</List.Item>
+					<List.Item as="a" href="#">
+						Contact Us
+					</List.Item>
+					<List.Item as="a" href="#">
+						Terms & Privacy
+					</List.Item>
+				</List>
 			</Container>
 		</Segment>
 	);
