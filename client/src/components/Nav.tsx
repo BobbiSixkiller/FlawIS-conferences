@@ -3,6 +3,7 @@ import { useInView } from "react-intersection-observer";
 import {
 	Container,
 	Dropdown,
+	Grid,
 	Menu,
 	Icon,
 	Label,
@@ -10,6 +11,7 @@ import {
 	Sidebar,
 	Header,
 	Button,
+	Flag,
 } from "semantic-ui-react";
 import { useState } from "react";
 import Link from "next/link";
@@ -92,7 +94,7 @@ export default function Nav({ children }) {
 				<Link href="/login">
 					<Menu.Item as="a">
 						<Icon name="sign-in" />
-						New Conference
+						Log In
 					</Menu.Item>
 				</Link>
 			</Sidebar>
@@ -101,35 +103,56 @@ export default function Nav({ children }) {
 				<div ref={ref}>
 					<FollowingBar inView={inView} width={width}>
 						<Container>
-							<Menu inverted={inView ? true : false} secondary size="large">
-								<Menu.Item>
-									<Image
-										alt="flaw-logo-notext"
-										src={inView ? logoInverted : logo}
-										height={35}
-										width={35}
-										priority={true}
-									/>
-								</Menu.Item>
-								<Menu.Item onClick={() => toggle(true)}>
-									<Icon name="sidebar" /> Menu
-								</Menu.Item>
-								<Menu.Menu position="right">
+							<Menu
+								style={{
+									flexDirection: "row",
+									justifyContent: "space-between",
+								}}
+								inverted={inView ? true : false}
+								secondary
+								size="large"
+							>
+								{width > 550 && (
 									<Menu.Item>
-										<Dropdown
-											item
-											trigger={
-												<>
-													<Icon name="world" /> English
-												</>
-											}
-										>
-											<Dropdown.Menu>
-												<Dropdown.Item>English</Dropdown.Item>
-												<Dropdown.Item>Slovensky</Dropdown.Item>
-											</Dropdown.Menu>
-										</Dropdown>
+										<Image
+											alt="flaw-logo-notext"
+											src={inView ? logoInverted : logo}
+											height={35}
+											width={35}
+											priority={true}
+										/>
 									</Menu.Item>
+								)}
+								<Menu.Item
+									style={{ marginLeft: 0 }}
+									onClick={() => toggle(true)}
+								>
+									<Icon name="sidebar" /> {width > 550 && "Menu"}
+								</Menu.Item>
+
+								{width < 550 && (
+									<Menu.Item style={{ marginLeft: "auto" }}>
+										<Image
+											alt="flaw-logo-notext"
+											src={inView ? logoInverted : logo}
+											height={35}
+											width={35}
+											priority={true}
+										/>
+									</Menu.Item>
+								)}
+								<Menu.Menu position="right">
+									<Dropdown item icon="world" style={{ marginLeft: "auto" }}>
+										<Dropdown.Menu>
+											<Dropdown.Header content="Language" />
+											<Dropdown.Item
+												key={1}
+												text={"English"}
+												value={"English"}
+											/>
+											<Dropdown.Item key={2} text={"Slovak"} value={"Slovak"} />
+										</Dropdown.Menu>
+									</Dropdown>
 								</Menu.Menu>
 							</Menu>
 						</Container>
@@ -165,10 +188,7 @@ export default function Nav({ children }) {
 							as="h1"
 							content="Conferences"
 							inverted
-							style={{
-								fontSize: width > 992 ? "4em" : "2em",
-								//fontWeight: "normal",
-							}}
+							style={{ fontSize: width > 992 ? "4em" : "2em" }}
 						/>
 						<Header
 							as="h2"
