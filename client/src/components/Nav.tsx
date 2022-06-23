@@ -46,11 +46,40 @@ const FollowingBar = styled.div<navProps>`
 		border 0.5s ease;
 `;
 
+const MastHead = styled.div`
+	position: relative;
+	overflow: hidden;
+	text-align: center;
+	padding: 0em;
+	color: rgba(255, 255, 255, 0.9);
+	margin-bottom: 0px;
+	border-bottom: none;
+	background-color: #000000;
+	background-position: 50% 50%;
+	-webkit-transform: translate3d(0, 0, 0);
+	transform: translate3d(0, 0, 0);
+	&:after {
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: -1;
+		width: 100%;
+		height: 100%;
+		transition: background-color 6s cubic-bezier(0.68, -0.55, 0.265, 1.4) 0s,
+			opacity 6s cubic-bezier(0.68, -0.55, 0.265, 1.4) 0s;
+		background-color: radial-gradient(
+			circle,
+			rgba(180, 104, 122, 1) 34%,
+			rgba(2, 0, 36, 1) 100%
+		);
+		content: "";
+		opacity: 0.45;
+	}
+`;
+
 export default function Nav({ children }) {
 	const { ref, inView } = useInView({ treshold: 1, initialInView: true });
 	const [opened, toggle] = useState(false);
-
-	console.log(inView);
 
 	const width = useWidth();
 
@@ -124,14 +153,14 @@ export default function Nav({ children }) {
 									</Menu.Item>
 								)}
 								<Menu.Item
-									style={{ marginLeft: 0 }}
+									style={{ marginLeft: 0, marginRight: 0 }}
 									onClick={() => toggle(true)}
 								>
 									<Icon name="sidebar" /> {width > 550 && "Menu"}
 								</Menu.Item>
 
 								{width < 550 && (
-									<Menu.Item style={{ marginLeft: "auto" }}>
+									<Menu.Item style={{ marginLeft: "auto", marginRight: 0 }}>
 										<Image
 											alt="flaw-logo-notext"
 											src={inView ? logoInverted : logo}
@@ -142,7 +171,11 @@ export default function Nav({ children }) {
 									</Menu.Item>
 								)}
 								<Menu.Menu position="right">
-									<Dropdown item icon="world" style={{ marginLeft: "auto" }}>
+									<Dropdown
+										item
+										icon="world"
+										style={{ marginLeft: "auto", marginRight: 0 }}
+									>
 										<Dropdown.Menu>
 											<Dropdown.Header content="Language" />
 											<Dropdown.Item
@@ -158,7 +191,7 @@ export default function Nav({ children }) {
 						</Container>
 					</FollowingBar>
 				</div>
-				<Segment
+				{/* <Segment
 					inverted
 					vertical
 					style={{
@@ -169,10 +202,9 @@ export default function Nav({ children }) {
 						zIndex: 3,
 						background:
 							"radial-gradient(circle, rgba(180,104,122,1) 34%, rgba(2,0,36,1) 100%)",
-						transition:
-							"background 6s cubic-bezier(0.680, -0.550, 0.265, 1.4) 2s, opacity 6s cubic-bezier(0.680, -0.550, 0.265, 1.4) 2s",
 					}}
-				>
+				> */}
+				<MastHead>
 					<Container
 						text
 						textAlign="center"
@@ -205,7 +237,8 @@ export default function Nav({ children }) {
 							</Button>
 						</Link>
 					</Container>
-				</Segment>
+				</MastHead>
+				{/* </Segment> */}
 
 				{children}
 			</Sidebar.Pusher>
