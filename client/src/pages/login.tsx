@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import Link from "next/link";
+import NextLink from "next/link";
 import Image from "next/image";
 import logo from "public/images/Flaw-logo-notext.png";
 
@@ -58,7 +58,7 @@ export default function Login() {
 						/>
 					</div>
 
-					<Header as="h2" color="teal" textAlign="center">
+					<Header as="h2" textAlign="center">
 						Log-in to your account
 					</Header>
 					<Form size="large">
@@ -69,15 +69,20 @@ export default function Login() {
 								iconPosition="left"
 								placeholder="E-mail address"
 							/>
-							<Form.Input
-								fluid
-								icon="lock"
-								iconPosition="left"
-								placeholder="Password"
-								type="password"
-							/>
+							<div style={{ position: "relative" }}>
+								<Form.Input
+									fluid
+									icon="lock"
+									iconPosition="left"
+									placeholder="Password"
+									type="password"
+								/>
+								<div style={{ position: "absolute", top: 0, right: 0 }}>
+									<NextLink href="/register">Forgot password?</NextLink>
+								</div>
+							</div>
 
-							<Button color="teal" fluid size="large">
+							<Button fluid size="large">
 								Login
 							</Button>
 						</Segment>

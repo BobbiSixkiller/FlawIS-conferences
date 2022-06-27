@@ -77,7 +77,7 @@ const MastHead = styled.div`
 			rgba(180, 104, 122, 1) 34%,
 			rgba(2, 0, 36, 1) 100%
 		);
-		animation: ${opacityChage} 4s ease-in;
+		animation: ${opacityChage} 3s ease-in;
 	}
 `;
 
