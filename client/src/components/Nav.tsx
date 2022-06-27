@@ -1,17 +1,14 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { useInView } from "react-intersection-observer";
 import {
 	Container,
 	Dropdown,
-	Grid,
 	Menu,
 	Icon,
 	Label,
-	Segment,
 	Sidebar,
 	Header,
 	Button,
-	Flag,
 } from "semantic-ui-react";
 import { useState } from "react";
 import Link from "next/link";
@@ -46,6 +43,15 @@ const FollowingBar = styled.div<navProps>`
 		border 0.5s ease;
 `;
 
+const opacityChage = keyframes`
+	from{
+		opacity: 0;
+	}
+	to{
+		opacity: 1;
+	}
+`;
+
 const MastHead = styled.div`
 	position: relative;
 	overflow: hidden;
@@ -54,9 +60,8 @@ const MastHead = styled.div`
 	color: rgba(255, 255, 255, 0.9);
 	margin-bottom: 0px;
 	border-bottom: none;
-	background-color: #000000;
+	background-color: black;
 	background-position: 50% 50%;
-	-webkit-transform: translate3d(0, 0, 0);
 	transform: translate3d(0, 0, 0);
 	&:after {
 		position: absolute;
@@ -65,15 +70,14 @@ const MastHead = styled.div`
 		z-index: -1;
 		width: 100%;
 		height: 100%;
-		transition: background-color 6s cubic-bezier(0.68, -0.55, 0.265, 1.4) 0s,
-			opacity 6s cubic-bezier(0.68, -0.55, 0.265, 1.4) 0s;
-		background-color: radial-gradient(
+		content: "";
+		background-size: cover;
+		background: radial-gradient(
 			circle,
 			rgba(180, 104, 122, 1) 34%,
 			rgba(2, 0, 36, 1) 100%
 		);
-		content: "";
-		opacity: 0.45;
+		animation: ${opacityChage} 4s ease-in;
 	}
 `;
 

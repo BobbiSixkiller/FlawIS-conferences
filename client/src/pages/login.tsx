@@ -1,4 +1,16 @@
 import { gql, useMutation } from "@apollo/client";
+import Link from "next/link";
+import Image from "next/image";
+import logo from "public/images/Flaw-logo-notext.png";
+
+import {
+	Button,
+	Form,
+	Grid,
+	Header,
+	Message,
+	Segment,
+} from "semantic-ui-react";
 
 const LOGIN = gql`
 	mutation login($email: String!, $password: String!) {
@@ -25,14 +37,56 @@ export default function Login() {
 	}
 
 	return (
-		<button
-			disabled={loading}
-			onClick={(e) => {
-				e.preventDefault();
-				login();
-			}}
-		>
-			Login
-		</button>
+		<Grid container centered>
+			<Grid.Row>
+				<Grid.Column style={{ maxWidth: "450px" }}>
+					<div
+						style={{
+							width: "100%",
+							display: "flex",
+							flexDirection: "row",
+							justifyContent: "center",
+							paddingTop: "32px",
+						}}
+					>
+						<Image
+							alt="flaw-logo-notext"
+							src={logo}
+							height={48}
+							width={48}
+							priority={true}
+						/>
+					</div>
+
+					<Header as="h2" color="teal" textAlign="center">
+						Log-in to your account
+					</Header>
+					<Form size="large">
+						<Segment stacked>
+							<Form.Input
+								fluid
+								icon="user"
+								iconPosition="left"
+								placeholder="E-mail address"
+							/>
+							<Form.Input
+								fluid
+								icon="lock"
+								iconPosition="left"
+								placeholder="Password"
+								type="password"
+							/>
+
+							<Button color="teal" fluid size="large">
+								Login
+							</Button>
+						</Segment>
+					</Form>
+					<Message style={{ textAlign: "center" }}>
+						New to us? <a href="#">Sign Up</a>
+					</Message>
+				</Grid.Column>
+			</Grid.Row>
+		</Grid>
 	);
 }
