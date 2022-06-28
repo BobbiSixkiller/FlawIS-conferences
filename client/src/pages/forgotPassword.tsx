@@ -45,7 +45,7 @@ export default function forgotPassword(params: type) {
 						<Segment>
 							<Form.Field
 								fluid
-								icon="user"
+								icon="at"
 								iconPosition="left"
 								placeholder="E-mail address"
 								label="Email"

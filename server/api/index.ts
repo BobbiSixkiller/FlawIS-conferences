@@ -23,54 +23,54 @@ import env from "dotenv";
 env.config();
 
 async function main() {
-	//Build schema
-	const schema = await buildFederatedSchema(
-		{
-			resolvers: [
-				ConferenceResolver,
-				SectionResolver,
-				SubmissionResolver,
-				AttendeeResolver,
-			],
-			// use document converting middleware
-			globalMiddlewares: [TypegooseMiddleware],
-			// use ObjectId scalar mapping
-			scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
-			emitSchemaFile: true,
-			container: Container,
-			//disabled validation for dev purposes
-			//validate: false,
-			authChecker,
-		},
-		{}
-	);
+  //Build schema
+  const schema = await buildFederatedSchema(
+    {
+      resolvers: [
+        ConferenceResolver,
+        SectionResolver,
+        SubmissionResolver,
+        AttendeeResolver,
+      ],
+      // use document converting middleware
+      globalMiddlewares: [TypegooseMiddleware],
+      // use ObjectId scalar mapping
+      scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
+      emitSchemaFile: true,
+      container: Container,
+      //disabled validation for dev purposes
+      //validate: false,
+      authChecker,
+    },
+    {}
+  );
 
-	//Create Apollo server
-	const server = new ApolloServer({
-		schema,
-		context: ({ req, res }: Context) => ({
-			req,
-			res,
-			user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
-			locale: req.headers.locale,
-		}),
-	});
+  //Create Apollo server
+  const server = new ApolloServer({
+    schema,
+    context: ({ req, res }: Context) => ({
+      req,
+      res,
+      user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
+      locale: req.headers.locale,
+    }),
+  });
 
-	// create mongoose connection
-	const mongoose = await connect(
-		process.env.DB_DEV_ATLAS || "mongodb://localhost:27017/test"
-	);
-	console.log(mongoose.connection && "Database connected!");
+  // create mongoose connection
+  const mongoose = await connect(
+    process.env.DB_DEV_ATLAS || "mongodb://localhost:27017/conferences"
+  );
+  console.log(mongoose.connection && "Database connected!");
 
-	await server.listen({ port: process.env.PORT || 5003 }, () =>
-		console.log(
-			`🚀 Server ready and listening at ==> http://localhost:${
-				process.env.PORT || 5003
-			}${server.graphqlPath}`
-		)
-	);
+  await server.listen({ port: process.env.PORT || 5003 }, () =>
+    console.log(
+      `🚀 Server ready and listening at ==> http://localhost:${
+        process.env.PORT || 5003
+      }${server.graphqlPath}`
+    )
+  );
 }
 
 main().catch((error) => {
-	console.log(error, "error");
+  console.log(error, "error");
 });
