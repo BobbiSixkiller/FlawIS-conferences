@@ -1,42 +1,18 @@
-import { gql, useMutation } from "@apollo/client";
-import NextLink from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import logo from "public/images/Flaw-logo-notext.png";
 
 import {
 	Button,
 	Form,
 	Grid,
-	Input,
 	Header,
+	Input,
 	Message,
 	Segment,
 } from "semantic-ui-react";
 
-const LOGIN = gql`
-	mutation login($email: String!, $password: String!) {
-		login(email: $email, password: $password) {
-			id
-			name
-			email
-			role
-			permissions
-		}
-	}
-`;
-
-export default function Login() {
-	const [login, { loading, errors, data }] = useMutation(LOGIN, {
-		variables: {
-			email: "matus.muransky@flaw.uniba.sk",
-			password: "101010555a",
-		},
-	});
-
-	if (data || errors) {
-		console.log(data, errors);
-	}
-
+export default function forgotPassword(params: type) {
 	return (
 		<Grid container centered>
 			<Grid.Row>
@@ -51,7 +27,7 @@ export default function Login() {
 							cursor: "pointer",
 						}}
 					>
-						<NextLink href="/">
+						<Link href="/">
 							<Image
 								alt="flaw-logo-notext"
 								src={logo}
@@ -59,11 +35,11 @@ export default function Login() {
 								width={48}
 								priority={true}
 							/>
-						</NextLink>
+						</Link>
 					</div>
 
 					<Header as="h2" textAlign="center">
-						Log-in
+						Reset your password
 					</Header>
 					<Form size="large">
 						<Segment>
@@ -75,28 +51,14 @@ export default function Login() {
 								label="Email"
 								control={Input}
 							/>
-							<div style={{ position: "relative" }}>
-								<Form.Field
-									fluid
-									icon="lock"
-									iconPosition="left"
-									placeholder="Password"
-									type="password"
-									label="Password"
-									control={Input}
-								/>
-								<div style={{ position: "absolute", top: 0, right: 0 }}>
-									<NextLink href="/forgotPassword">Forgot password?</NextLink>
-								</div>
-							</div>
 
 							<Button fluid size="large">
-								Login
+								Send me a reset link
 							</Button>
 						</Segment>
 					</Form>
 					<Message style={{ textAlign: "center" }}>
-						New to us? <NextLink href="/register">Register!</NextLink>
+						Or you remember it? <Link href="/login">Log in!</Link>
 					</Message>
 				</Grid.Column>
 			</Grid.Row>
