@@ -15,6 +15,7 @@ import {
 import InputField from "src/components/form/InputField";
 import { Formik, FormikProps } from "formik";
 import { FC } from "react";
+import { InferType, object, string } from "yup";
 
 const LOGIN = gql`
   mutation login($email: String!, $password: String!) {
@@ -28,10 +29,12 @@ const LOGIN = gql`
   }
 `;
 
-interface Values {
-  email: string;
-  password: string;
-}
+const loginSchema = object({
+  email: string().email().required(),
+  password: string().required(),
+});
+
+type Values = InferType<typeof loginSchema>;
 
 const Login: FC = () => {
   const [login, { loading, errors, data }] = useMutation(LOGIN, {
@@ -78,6 +81,7 @@ const Login: FC = () => {
               email: "",
               password: "",
             }}
+            validationSchema={loginSchema}
             onSubmit={(values, actions) => {
               setTimeout(() => {
                 console.log(values);

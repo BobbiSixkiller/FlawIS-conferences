@@ -1,3 +1,4 @@
+import { Formik, FormikProps } from "formik";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "public/images/Flaw-logo-notext.png";
@@ -5,7 +6,6 @@ import { FC } from "react";
 
 import {
   Button,
-  Checkbox,
   Form,
   Grid,
   Header,
@@ -13,6 +13,23 @@ import {
   Message,
   Segment,
 } from "semantic-ui-react";
+import CheckboxField from "src/components/form/CheckboxField";
+import InputField from "src/components/form/InputField";
+import { boolean, InferType, object, ref, string } from "yup";
+
+const registerSchema = object({
+  name: string().required(),
+  email: string().required().email(),
+  organisation: string().required(),
+  telephone: string().required(),
+  password: string().required(),
+  repeatPass: string()
+    .required()
+    .oneOf([ref("password")]),
+  terms: boolean().oneOf([true], "You must agree with the Privacy policy"),
+});
+
+type Values = InferType<typeof registerSchema>;
 
 const Register: FC = () => {
   return (
@@ -43,82 +60,116 @@ const Register: FC = () => {
           <Header as="h2" textAlign="center">
             Register
           </Header>
-          <Form size="large">
-            <Segment>
-              <Form.Field
-                fluid
-                icon="user"
-                iconPosition="left"
-                placeholder="Name including titles"
-                label="Name including titles"
-                control={Input}
-              />
+          <Formik
+            initialValues={{
+              name: "",
+              email: "",
+              organisation: "",
+              telephone: "",
+              password: "",
+              repeatPass: "",
+              terms: false,
+            }}
+            validationSchema={registerSchema}
+            onSubmit={(values, actions) => {
+              setTimeout(() => {
+                console.log(values);
 
-              <Form.Field
-                fluid
-                icon="at"
-                iconPosition="left"
-                placeholder="E-mail address"
-                label="Email"
-                control={Input}
-              />
+                actions.setSubmitting(false);
+              }, 1000);
+            }}
+          >
+            {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
+              <Form size="large" onSubmit={handleSubmit}>
+                <Segment>
+                  <InputField
+                    fluid
+                    icon="user"
+                    iconPosition="left"
+                    placeholder="Name including titles"
+                    label="Name including titles"
+                    name="name"
+                    control={Input}
+                  />
 
-              <Form.Field
-                fluid
-                icon="phone"
-                iconPosition="left"
-                placeholder="Telephone number"
-                label="Telephone"
-                control={Input}
-              />
+                  <InputField
+                    fluid
+                    icon="at"
+                    iconPosition="left"
+                    placeholder="E-mail address"
+                    label="Email"
+                    name="email"
+                    control={Input}
+                  />
 
-              <Form.Field
-                fluid
-                icon="building"
-                iconPosition="left"
-                placeholder="Name of the organisation"
-                label="Organisation"
-                control={Input}
-              />
+                  <InputField
+                    fluid
+                    icon="phone"
+                    iconPosition="left"
+                    placeholder="Telephone number"
+                    label="Telephone"
+                    name="telephone"
+                    control={Input}
+                  />
 
-              <Form.Field
-                fluid
-                icon="lock"
-                iconPosition="left"
-                placeholder="Password"
-                type="password"
-                label="Password"
-                control={Input}
-              />
+                  <InputField
+                    fluid
+                    icon="building"
+                    iconPosition="left"
+                    placeholder="Name of the organisation"
+                    label="Organisation"
+                    name="organisation"
+                    control={Input}
+                  />
 
-              <Form.Field
-                fluid
-                icon="lock"
-                iconPosition="left"
-                placeholder="Password"
-                type="password"
-                label="Repeat Password"
-                control={Input}
-              />
+                  <InputField
+                    fluid
+                    icon="lock"
+                    iconPosition="left"
+                    placeholder="Password"
+                    type="password"
+                    label="Password"
+                    name="password"
+                    control={Input}
+                  />
 
-              <Form.Field>
-                <Checkbox
-                  label={
-                    <label>
-                      I agree with the{" "}
-                      <Link href="https://uniba.sk/en/privacy-policy/">
-                        Privacy Policy
-                      </Link>
-                    </label>
-                  }
-                />
-              </Form.Field>
+                  <InputField
+                    fluid
+                    icon="lock"
+                    iconPosition="left"
+                    placeholder="Password"
+                    type="password"
+                    label="Repeat Password"
+                    name="repeatPass"
+                    control={Input}
+                  />
 
-              <Button fluid size="large">
-                Register
-              </Button>
-            </Segment>
-          </Form>
+                  <CheckboxField
+                    name="terms"
+                    label={
+                      <label>
+                        I agree with the{" "}
+                        <Link href="https://uniba.sk/en/privacy-policy/">
+                          Privacy policy
+                        </Link>
+                      </label>
+                    }
+                  />
+
+                  <Button
+                    type="submit"
+                    loading={isSubmitting}
+                    disabled={isSubmitting}
+                    fluid
+                    size="large"
+                  >
+                    Register
+                  </Button>
+                </Segment>
+              </Form>
+            )}
+          </Formik>
+
           <Message style={{ textAlign: "center" }}>
             Already have an account? <Link href="/login">Log In!</Link>
           </Message>

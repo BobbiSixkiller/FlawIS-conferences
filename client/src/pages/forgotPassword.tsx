@@ -14,10 +14,11 @@ import {
   Segment,
 } from "semantic-ui-react";
 import InputField from "src/components/form/InputField";
+import { InferType, object, string } from "yup";
 
-interface Values {
-  email: string;
-}
+const forgotPasswordSchema = object({ email: string().required().email() });
+
+type Values = InferType<typeof forgotPasswordSchema>;
 
 const ForgotPassword: FC = () => {
   return (
@@ -50,6 +51,7 @@ const ForgotPassword: FC = () => {
           </Header>
           <Formik
             initialValues={{ email: "" }}
+            validationSchema={forgotPasswordSchema}
             onSubmit={(values, actions) => {
               setTimeout(() => {
                 console.log(values);

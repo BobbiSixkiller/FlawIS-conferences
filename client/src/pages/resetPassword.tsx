@@ -6,11 +6,16 @@ import { FC } from "react";
 
 import { Button, Form, Grid, Header, Input, Segment } from "semantic-ui-react";
 import InputField from "src/components/form/InputField";
+import { InferType, object, ref, string } from "yup";
 
-interface Values {
-  password: string;
-  repeatPass: string;
-}
+const resetPasswordSchema = object({
+  password: string().required(),
+  repeatPass: string()
+    .required()
+    .oneOf([ref("password")]),
+});
+
+type Values = InferType<typeof resetPasswordSchema>;
 
 const ResetPassword: FC = () => {
   return (
@@ -43,6 +48,7 @@ const ResetPassword: FC = () => {
           </Header>
           <Formik
             initialValues={{ password: "", repeatPass: "" }}
+            validationSchema={resetPasswordSchema}
             onSubmit={(values, actions) => {
               setTimeout(() => {
                 console.log(values);
