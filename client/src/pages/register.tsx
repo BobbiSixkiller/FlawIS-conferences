@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "public/images/Flaw-logo-notext.png";
+import { FC } from "react";
 
 import {
   Button,
@@ -13,7 +14,7 @@ import {
   Segment,
 } from "semantic-ui-react";
 
-export default function Register() {
+const Register: FC = () => {
   return (
     <Grid container centered>
       <Grid.Row>
@@ -125,4 +126,6 @@ export default function Register() {
       </Grid.Row>
     </Grid>
   );
-}
+};
+
+export default Register;

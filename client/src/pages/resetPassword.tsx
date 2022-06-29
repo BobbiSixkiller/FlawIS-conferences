@@ -1,10 +1,18 @@
+import { Formik, FormikProps } from "formik";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "public/images/Flaw-logo-notext.png";
+import { FC } from "react";
 
 import { Button, Form, Grid, Header, Input, Segment } from "semantic-ui-react";
+import InputField from "src/components/form/InputField";
 
-export default function ResetPassword(params: type) {
+interface Values {
+  password: string;
+  repeatPass: string;
+}
+
+const ResetPassword: FC = () => {
   return (
     <Grid container centered>
       <Grid.Row>
@@ -33,35 +41,58 @@ export default function ResetPassword(params: type) {
           <Header as="h2" textAlign="center">
             Create new password
           </Header>
-          <Form size="large">
-            <Segment>
-              <Form.Field
-                fluid
-                icon="lock"
-                iconPosition="left"
-                placeholder="Password"
-                type="password"
-                label="Password"
-                control={Input}
-              />
+          <Formik
+            initialValues={{ password: "", repeatPass: "" }}
+            onSubmit={(values, actions) => {
+              setTimeout(() => {
+                console.log(values);
 
-              <Form.Field
-                fluid
-                icon="lock"
-                iconPosition="left"
-                placeholder="Password"
-                type="password"
-                label="Repeat Password"
-                control={Input}
-              />
+                actions.setSubmitting(false);
+              }, 1000);
+            }}
+          >
+            {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
+              <Form size="large" onSubmit={handleSubmit}>
+                <Segment>
+                  <InputField
+                    name="password"
+                    fluid
+                    icon="lock"
+                    iconPosition="left"
+                    placeholder="Password"
+                    type="password"
+                    label="Password"
+                    control={Input}
+                  />
 
-              <Button fluid size="large">
-                Reset password
-              </Button>
-            </Segment>
-          </Form>
+                  <InputField
+                    name="repeatPass"
+                    fluid
+                    icon="lock"
+                    iconPosition="left"
+                    placeholder="Password"
+                    type="password"
+                    label="Repeat Password"
+                    control={Input}
+                  />
+
+                  <Button
+                    type="submit"
+                    loading={isSubmitting}
+                    disabled={isSubmitting}
+                    fluid
+                    size="large"
+                  >
+                    Reset password
+                  </Button>
+                </Segment>
+              </Form>
+            )}
+          </Formik>
         </Grid.Column>
       </Grid.Row>
     </Grid>
   );
-}
+};
+
+export default ResetPassword;
