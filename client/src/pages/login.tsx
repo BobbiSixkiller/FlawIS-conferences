@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import NextLink from "next/link";
 import Image from "next/image";
 import logo from "public/images/Flaw-logo-notext.png";
@@ -16,18 +16,7 @@ import InputField from "src/components/form/InputField";
 import { Formik, FormikProps } from "formik";
 import { FC } from "react";
 import { InferType, object, string } from "yup";
-
-const LOGIN = gql`
-  mutation login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      id
-      name
-      email
-      role
-      permissions
-    }
-  }
-`;
+import { LOGIN } from "src/graphql/Auth.graphql";
 
 const loginSchema = object({
   email: string().email().required(),
@@ -82,13 +71,7 @@ const Login: FC = () => {
               password: "",
             }}
             validationSchema={loginSchema}
-            onSubmit={(values, actions) => {
-              setTimeout(() => {
-                console.log(values);
-
-                actions.setSubmitting(false);
-              }, 1000);
-            }}
+            onSubmit={(values, actions) => login({ variables: values })}
           >
             {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
               <Form size="large" onSubmit={handleSubmit}>
