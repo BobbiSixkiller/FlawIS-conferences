@@ -1,22 +1,25 @@
-import { useMutation } from "@apollo/client";
 import NextLink from "next/link";
 import Image from "next/image";
 import logo from "public/images/Flaw-logo-notext.png";
 
+import InputField from "src/components/form/InputField";
+
+import { LOGIN } from "src/graphql/Auth.graphql";
+import { login, loginVariables } from "src/graphql/__generated__/login";
+import { useMutation } from "@apollo/client";
 import {
   Button,
   Form,
   Grid,
-  Input,
   Header,
+  Input,
   Message,
   Segment,
 } from "semantic-ui-react";
-import InputField from "src/components/form/InputField";
-import { Formik, FormikProps } from "formik";
-import { FC } from "react";
+import { Formik, FormikProps, useFormikContext } from "formik";
 import { InferType, object, string } from "yup";
-import { LOGIN } from "src/graphql/Auth.graphql";
+import { FC, useContext } from "react";
+import { AuthContext } from "src/context/auth";
 
 const loginSchema = object({
   email: string().email().required(),
@@ -26,16 +29,12 @@ const loginSchema = object({
 type Values = InferType<typeof loginSchema>;
 
 const Login: FC = () => {
-  const [login, { loading, errors, data }] = useMutation(LOGIN, {
-    variables: {
-      email: "matus.muransky@flaw.uniba.sk",
-      password: "101010555a",
-    },
-  });
+  const context = useContext(AuthContext);
+  console.log(context);
 
-  if (data || errors) {
-    console.log(data, errors);
-  }
+  const [login] = useMutation<login, loginVariables>(LOGIN, {
+    onCompleted: (data) => console.log(data),
+  });
 
   return (
     <Grid container centered>
@@ -71,49 +70,69 @@ const Login: FC = () => {
               password: "",
             }}
             validationSchema={loginSchema}
-            onSubmit={(values, actions) => login({ variables: values })}
+            onSubmit={async (values, actions) => {
+              try {
+                await login({ variables: values });
+              } catch (error) {
+                actions.setStatus(error);
+              }
+            }}
           >
-            {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
-              <Form size="large" onSubmit={handleSubmit}>
-                <Segment>
-                  <InputField
-                    fluid
-                    icon="user"
-                    iconPosition="left"
-                    placeholder="E-mail address"
-                    label="Email"
-                    name="email"
-                    control={Input}
+            {({
+              handleSubmit,
+              isSubmitting,
+              status,
+              setStatus,
+            }: FormikProps<Values>) => (
+              <>
+                {status && (
+                  <Message
+                    error
+                    content={status.message}
+                    onDismiss={() => setStatus(null)}
                   />
-                  <div style={{ position: "relative" }}>
+                )}
+                <Form size="large" onSubmit={handleSubmit}>
+                  <Segment>
                     <InputField
                       fluid
-                      icon="lock"
+                      icon="user"
                       iconPosition="left"
-                      placeholder="Password"
-                      type="password"
-                      label="Password"
-                      name="password"
+                      placeholder="E-mail address"
+                      label="Email"
+                      name="email"
                       control={Input}
                     />
-                    <div style={{ position: "absolute", top: 0, right: 0 }}>
-                      <NextLink href="/forgotPassword">
-                        Forgot password?
-                      </NextLink>
+                    <div style={{ position: "relative" }}>
+                      <InputField
+                        fluid
+                        icon="lock"
+                        iconPosition="left"
+                        placeholder="Password"
+                        type="password"
+                        label="Password"
+                        name="password"
+                        control={Input}
+                      />
+                      <div style={{ position: "absolute", top: 0, right: 0 }}>
+                        <NextLink href="/forgotPassword">
+                          Forgot password?
+                        </NextLink>
+                      </div>
                     </div>
-                  </div>
 
-                  <Button
-                    fluid
-                    size="large"
-                    loading={isSubmitting}
-                    disabled={isSubmitting}
-                    type="submit"
-                  >
-                    Login
-                  </Button>
-                </Segment>
-              </Form>
+                    <Button
+                      fluid
+                      size="large"
+                      loading={isSubmitting}
+                      disabled={isSubmitting}
+                      type="submit"
+                    >
+                      Login
+                    </Button>
+                  </Segment>
+                </Form>
+              </>
             )}
           </Formik>
 

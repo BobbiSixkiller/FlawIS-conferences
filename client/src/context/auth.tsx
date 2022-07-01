@@ -1,74 +1,84 @@
-import { createContext, useReducer, ReactNode } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { createContext, Dispatch, useReducer } from "react";
+import { useQuery } from "@apollo/client";
+import { ME } from "src/graphql/Auth.graphql";
+import { me } from "src/graphql/__generated__/me";
+import { login_login } from "src/graphql/__generated__/login";
 import { Loader } from "semantic-ui-react";
 
-const ME = gql`
-	query me {
-		me {
-			id
-			email
-			role
-			permissions
-			billings {
-				id
-				name
-				address {
-					street
-					city
-					postal
-					country
-				}
-				ICO
-				DIC
-				ICDPH
-				IBAN
-				SWIFT
-			}
-		}
-	}
-`;
+type ActionMap<M extends { [index: string]: any }> = {
+  [Key in keyof M]: M[Key] extends undefined
+    ? {
+        type: Key;
+      }
+    : {
+        type: Key;
+        payload: M[Key];
+      };
+};
 
-const AuthContext = createContext(null);
-
-function authReducer(state, action) {
-	switch (action.type) {
-		case "LOGIN":
-			return { user: action.user, loading: false, error: "" };
-
-		case "LOGOUT":
-			return { ...state, user: null };
-
-		case "ERROR":
-			return { ...state, error: action.error, loading: false };
-
-		default:
-			return state;
-	}
+enum ActionTypes {
+  Login = "LOGIN",
+  Logout = "LOGOUT",
+  Error = "ERROR",
 }
 
-function AuthProvider({ children: ReactNode }) {
-	const [state, dispatch] = useReducer(authReducer, {
-		user: null,
-		loading: true,
-		error: "",
-	});
+type ActionPayload = {
+  [ActionTypes.Login]: { user: login_login };
+  [ActionTypes.Logout]: undefined;
+  [ActionTypes.Error]: { error: string };
+};
 
-	const { data, loading, error } = useQuery(ME, {
-		onComplete: ({ me }) => {
-			dispatch({ type: "LOGIN", user: me });
-			console.log(me);
-		},
-		onError: (error) => {
-			console.log(error);
-			dispatch({ type: "ERROR", error });
-		},
-	});
+type AuthActions = ActionMap<ActionPayload>[keyof ActionMap<ActionPayload>];
 
-	return (
-		<AuthContext.Provider value={{ ...state, dispatch }}>
-			{children}
-		</AuthContext.Provider>
-	);
+function authReducer(state: AuthContextType, action: AuthActions) {
+  switch (action.type) {
+    case "LOGIN":
+      return { user: action.payload.user, loading: false, error: "" };
+
+    case "LOGOUT":
+      return { ...state, user: null };
+
+    case "ERROR":
+      return { ...state, error: action.payload.error, loading: false };
+
+    default:
+      return state;
+  }
+}
+
+interface AuthContextType {
+  loading: boolean;
+  error: string;
+  user: login_login | null;
+  dispatch: Dispatch<AuthActions>;
+}
+
+const AuthContext = createContext<AuthContextType>(null);
+
+function AuthProvider({ children }) {
+  const [state, dispatch] = useReducer(authReducer, {
+    loading: true,
+    error: "",
+    user: null,
+  });
+
+  const { loading } = useQuery<me>(ME, {
+    onCompleted: ({ me }) => {
+      dispatch({ type: ActionTypes.Login, payload: { user: me } });
+      console.log(me);
+    },
+    onError: (error) => {
+      console.log(error);
+      dispatch({ type: ActionTypes.Error, payload: { error: error.message } });
+    },
+  });
+  console.log(state.loading);
+
+  return (
+    <AuthContext.Provider value={{ ...state, dispatch }}>
+      {state.loading || loading ? <Loader active /> : children}
+    </AuthContext.Provider>
+  );
 }
 
 export { AuthProvider, AuthContext };
