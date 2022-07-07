@@ -12,14 +12,14 @@ import ProtectedRouteProvider from "src/providers/ProtectedRoute";
 const App: NextPage<AppProps> = ({ Component, pageProps }) => {
   const apolloClient = useApollo(pageProps);
 
-  const protectedRoute = pageProps.protectedRoute as boolean;
+  const protect = pageProps.protect as boolean;
 
   const getLayout = Component.getLayout || ((page) => page);
 
   return (
     <ApolloProvider client={apolloClient}>
       <AuthProvider>
-        <ProtectedRouteProvider>
+        <ProtectedRouteProvider protect={protect}>
           {getLayout(<Component {...pageProps} />)}
         </ProtectedRouteProvider>
       </AuthProvider>

@@ -16,7 +16,7 @@ type ActionMap<M extends { [index: string]: any }> = {
       };
 };
 
-enum ActionTypes {
+export enum ActionTypes {
   Login = "LOGIN",
   Logout = "LOGOUT",
 }

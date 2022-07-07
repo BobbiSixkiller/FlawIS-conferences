@@ -18,6 +18,8 @@ import {
 } from "semantic-ui-react";
 import { Formik, FormikProps } from "formik";
 import { InferType, object, string } from "yup";
+import { useContext } from "react";
+import { ActionTypes, AuthContext } from "src/providers/Auth";
 
 const loginSchema = object({
   email: string().email().required(),
@@ -27,8 +29,10 @@ const loginSchema = object({
 type Values = InferType<typeof loginSchema>;
 
 export default function Login() {
+  const { dispatch } = useContext(AuthContext);
   const [login] = useMutation<login, loginVariables>(LOGIN, {
-    onCompleted: (data) => console.log(data),
+    onCompleted: (data) =>
+      dispatch({ type: ActionTypes.Login, payload: { user: data.login } }),
   });
 
   return (

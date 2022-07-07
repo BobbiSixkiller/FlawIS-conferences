@@ -10,7 +10,7 @@ export default function ProtectedRouteProvider({
   protect?: boolean;
 }) {
   const { user } = useContext(AuthContext);
-  console.log(user);
+  console.log(user, protect);
 
   if (!protect) return <>{children}</>;
 
