@@ -2,7 +2,6 @@ import { Formik, FormikProps } from "formik";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "public/images/Flaw-logo-notext.png";
-import { FC } from "react";
 
 import {
   Button,
@@ -31,7 +30,7 @@ const registerSchema = object({
 
 type Values = InferType<typeof registerSchema>;
 
-const Register: FC = () => {
+export default function Register() {
   return (
     <Grid container centered>
       <Grid.Row>
@@ -177,6 +176,4 @@ const Register: FC = () => {
       </Grid.Row>
     </Grid>
   );
-};
-
-export default Register;
+}

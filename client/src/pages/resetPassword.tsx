@@ -17,7 +17,7 @@ const resetPasswordSchema = object({
 
 type Values = InferType<typeof resetPasswordSchema>;
 
-const ResetPassword: FC = () => {
+export default function ResetPassword() {
   return (
     <Grid container centered>
       <Grid.Row>
@@ -99,6 +99,4 @@ const ResetPassword: FC = () => {
       </Grid.Row>
     </Grid>
   );
-};
-
-export default ResetPassword;
+}

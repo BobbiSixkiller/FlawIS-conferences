@@ -29,7 +29,7 @@ const FollowingBar = styled.div<navProps>`
   z-index: 900;
   top: 0px;
   left: 0%;
-  padding: ${(props: navProps) =>
+  padding: ${(props) =>
     props.inView && props.width > 992 ? "2em 0em" : "0em 0em"};
   background-color: ${(props) => (props.inView ? "transparent" : "#FFFFFF")};
   width: 100%;

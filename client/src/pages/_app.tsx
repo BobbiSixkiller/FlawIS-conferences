@@ -6,16 +6,23 @@ import "semantic-ui-css/semantic.min.css";
 import "./app.css";
 
 import { useApollo } from "../lib/apollo";
-import { AuthProvider } from "src/context/auth";
+import { AuthProvider } from "src/providers/Auth";
+import ProtectedRouteProvider from "src/providers/ProtectedRoute";
 
 const App: NextPage<AppProps> = ({ Component, pageProps }) => {
   const apolloClient = useApollo(pageProps);
+
+  const protectedRoute = pageProps.protectedRoute as boolean;
 
   const getLayout = Component.getLayout || ((page) => page);
 
   return (
     <ApolloProvider client={apolloClient}>
-      <AuthProvider>{getLayout(<Component {...pageProps} />)}</AuthProvider>
+      <AuthProvider>
+        <ProtectedRouteProvider>
+          {getLayout(<Component {...pageProps} />)}
+        </ProtectedRouteProvider>
+      </AuthProvider>
     </ApolloProvider>
   );
 };

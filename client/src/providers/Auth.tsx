@@ -1,4 +1,4 @@
-import { createContext, Dispatch, useReducer } from "react";
+import { createContext, Dispatch, ReactNode, useReducer } from "react";
 import { useQuery } from "@apollo/client";
 import { ME } from "src/graphql/Auth.graphql";
 import { me } from "src/graphql/__generated__/me";
@@ -19,13 +19,11 @@ type ActionMap<M extends { [index: string]: any }> = {
 enum ActionTypes {
   Login = "LOGIN",
   Logout = "LOGOUT",
-  Error = "ERROR",
 }
 
 type ActionPayload = {
   [ActionTypes.Login]: { user: login_login };
   [ActionTypes.Logout]: undefined;
-  [ActionTypes.Error]: { error: string };
 };
 
 type AuthActions = ActionMap<ActionPayload>[keyof ActionMap<ActionPayload>];
@@ -33,13 +31,10 @@ type AuthActions = ActionMap<ActionPayload>[keyof ActionMap<ActionPayload>];
 function authReducer(state: AuthContextType, action: AuthActions) {
   switch (action.type) {
     case "LOGIN":
-      return { user: action.payload.user, loading: false, error: "" };
+      return { user: action.payload.user, loading: false };
 
     case "LOGOUT":
       return { ...state, user: null };
-
-    case "ERROR":
-      return { ...state, error: action.payload.error, loading: false };
 
     default:
       return state;
@@ -48,31 +43,25 @@ function authReducer(state: AuthContextType, action: AuthActions) {
 
 interface AuthContextType {
   loading: boolean;
-  error: string;
   user: login_login | null;
   dispatch: Dispatch<AuthActions>;
 }
 
 const AuthContext = createContext<AuthContextType>(null);
 
-function AuthProvider({ children }) {
+function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, {
     loading: true,
-    error: "",
     user: null,
   });
 
   const { loading } = useQuery<me>(ME, {
-    onCompleted: ({ me }) => {
-      dispatch({ type: ActionTypes.Login, payload: { user: me } });
-      console.log(me);
-    },
+    onCompleted: ({ me }) =>
+      dispatch({ type: ActionTypes.Login, payload: { user: me } }),
     onError: (error) => {
       console.log(error);
-      dispatch({ type: ActionTypes.Error, payload: { error: error.message } });
     },
   });
-  console.log(state.loading);
 
   return (
     <AuthContext.Provider value={{ ...state, dispatch }}>
