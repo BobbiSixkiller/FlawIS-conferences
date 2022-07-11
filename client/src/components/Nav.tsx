@@ -10,7 +10,7 @@ import {
   Header,
   Button,
 } from "semantic-ui-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -18,6 +18,8 @@ import logoInverted from "public/images/Flaw-logo-notext-inverted.png";
 import logo from "public/images/Flaw-logo-notext.png";
 
 import useWidth from "src/hooks/useWidth";
+import { AuthContext } from "src/providers/Auth";
+import { Role } from "__generated__/globalTypes";
 
 interface navProps {
   inView: boolean;
@@ -87,6 +89,8 @@ export default function Nav({ children }) {
 
   const width = useWidth();
 
+  const { user } = useContext(AuthContext);
+
   return (
     <Sidebar.Pushable>
       <Sidebar
@@ -110,26 +114,37 @@ export default function Nav({ children }) {
           </Menu.Item>
         </Link>
 
-        <Link href="/new">
-          <Menu.Item as="a">
-            <Icon name="plus" />
-            New Conference
-          </Menu.Item>
-        </Link>
+        {user && user.role === Role.Admin && (
+          <Link href="/new">
+            <Menu.Item as="a">
+              <Icon name="plus" />
+              New Conference
+            </Menu.Item>
+          </Link>
+        )}
 
-        <Link href="/register">
+        {user ? (
           <Menu.Item as="a">
-            <Icon name="signup" />
-            Sign Up
+            <Icon name="sign-out" />
+            Log Out
           </Menu.Item>
-        </Link>
+        ) : (
+          <>
+            <Link href="/register" passHref>
+              <Menu.Item as="a">
+                <Icon name="signup" />
+                Sign Up
+              </Menu.Item>
+            </Link>
 
-        <Link href="/login">
-          <Menu.Item as="a">
-            <Icon name="sign-in" />
-            Log In
-          </Menu.Item>
-        </Link>
+            <Link href="/login" passHref>
+              <Menu.Item as="a">
+                <Icon name="sign-in" />
+                Log In
+              </Menu.Item>
+            </Link>
+          </>
+        )}
       </Sidebar>
 
       <Sidebar.Pusher dimmed={opened}>

@@ -1,7 +1,11 @@
+import { useMutation } from "@apollo/client";
 import { Formik, FormikProps } from "formik";
+import { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import logo from "public/images/Flaw-logo-notext.png";
+import { useContext } from "react";
 
 import {
   Button,
@@ -14,6 +18,12 @@ import {
 } from "semantic-ui-react";
 import CheckboxField from "src/components/form/CheckboxField";
 import InputField from "src/components/form/InputField";
+import { REGISTER } from "src/graphql/Auth.graphql";
+import {
+  register,
+  registerVariables,
+} from "src/graphql/__generated__/register";
+import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { boolean, InferType, object, ref, string } from "yup";
 
 const registerSchema = object({
@@ -30,7 +40,17 @@ const registerSchema = object({
 
 type Values = InferType<typeof registerSchema>;
 
-export default function Register() {
+const Register: NextPage = () => {
+  const { dispatch } = useContext(AuthContext);
+  const router = useRouter();
+
+  const [register] = useMutation<register, registerVariables>(REGISTER, {
+    onCompleted: ({ register }) => {
+      dispatch({ type: ActionTypes.Login, payload: { user: register } });
+      router.push("/");
+    },
+  });
+
   return (
     <Grid container centered>
       <Grid.Row>
@@ -71,11 +91,11 @@ export default function Register() {
             }}
             validationSchema={registerSchema}
             onSubmit={(values, actions) => {
-              setTimeout(() => {
-                console.log(values);
-
-                actions.setSubmitting(false);
-              }, 1000);
+              try {
+                register({ variables: { data: { ...values } } });
+              } catch (error) {
+                console.log(error);
+              }
             }}
           >
             {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
@@ -176,4 +196,6 @@ export default function Register() {
       </Grid.Row>
     </Grid>
   );
-}
+};
+
+export default Register;

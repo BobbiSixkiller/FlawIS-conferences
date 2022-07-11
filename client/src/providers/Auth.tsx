@@ -34,7 +34,7 @@ function authReducer(state: AuthContextType, action: AuthActions) {
       return { user: action.payload.user, loading: false };
 
     case "LOGOUT":
-      return { ...state, user: null };
+      return { user: null, loading: false };
 
     default:
       return state;
@@ -60,6 +60,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
       dispatch({ type: ActionTypes.Login, payload: { user: me } }),
     onError: (error) => {
       console.log(error);
+      dispatch({ type: ActionTypes.Logout });
     },
   });
 

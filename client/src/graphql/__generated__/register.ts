@@ -3,13 +3,13 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Role } from "./../../../__generated__/globalTypes";
+import { RegisterInput, Role } from "./../../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL mutation operation: login
+// GraphQL mutation operation: register
 // ====================================================
 
-export interface login_login_billings_address {
+export interface register_register_billings_address {
   __typename: "Address";
   street: string;
   city: string;
@@ -17,11 +17,11 @@ export interface login_login_billings_address {
   country: string;
 }
 
-export interface login_login_billings {
+export interface register_register_billings {
   __typename: "Billing";
   id: any | null;
   name: string;
-  address: login_login_billings_address;
+  address: register_register_billings_address;
   ICO: string;
   DIC: string;
   ICDPH: string;
@@ -29,21 +29,20 @@ export interface login_login_billings {
   SWIFT: string | null;
 }
 
-export interface login_login {
+export interface register_register {
   __typename: "User";
   id: any;
   name: string;
   email: string;
   role: Role;
   active: boolean;
-  billings: login_login_billings[];
+  billings: register_register_billings[];
 }
 
-export interface login {
-  login: login_login;
+export interface register {
+  register: register_register;
 }
 
-export interface loginVariables {
-  email: string;
-  password: string;
+export interface registerVariables {
+  data: RegisterInput;
 }

@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { Role } from "./../../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL query operation: me
 // ====================================================
@@ -32,8 +34,8 @@ export interface me_me {
   id: any;
   name: string;
   email: string;
-  role: string;
-  permissions: string[];
+  role: Role;
+  active: boolean;
   billings: me_me_billings[];
 }
 

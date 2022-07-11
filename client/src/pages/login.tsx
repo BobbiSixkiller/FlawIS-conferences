@@ -20,6 +20,7 @@ import { Formik, FormikProps } from "formik";
 import { InferType, object, string } from "yup";
 import { useContext } from "react";
 import { ActionTypes, AuthContext } from "src/providers/Auth";
+import { NextPage } from "next";
 
 const loginSchema = object({
   email: string().email().required(),
@@ -28,11 +29,11 @@ const loginSchema = object({
 
 type Values = InferType<typeof loginSchema>;
 
-export default function Login() {
+const Login: NextPage = () => {
   const { dispatch } = useContext(AuthContext);
   const [login] = useMutation<login, loginVariables>(LOGIN, {
-    onCompleted: (data) =>
-      dispatch({ type: ActionTypes.Login, payload: { user: data.login } }),
+    onCompleted: ({ login }) =>
+      dispatch({ type: ActionTypes.Login, payload: { user: login } }),
   });
 
   return (
@@ -142,4 +143,6 @@ export default function Login() {
       </Grid.Row>
     </Grid>
   );
-}
+};
+
+export default Login;

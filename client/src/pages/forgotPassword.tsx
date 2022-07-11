@@ -1,8 +1,8 @@
 import { Formik, FormikProps } from "formik";
+import { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "public/images/Flaw-logo-notext.png";
-import { FC } from "react";
 
 import {
   Button,
@@ -20,7 +20,7 @@ const forgotPasswordSchema = object({ email: string().required().email() });
 
 type Values = InferType<typeof forgotPasswordSchema>;
 
-const ForgotPassword: FC = () => {
+const ForgotPassword: NextPage = () => {
   return (
     <Grid container centered>
       <Grid.Row>
