@@ -1,11 +1,11 @@
 import { useMutation } from "@apollo/client";
-import { Formik, FormikProps } from "formik";
+import { Formik, FormikProps, useFormikContext } from "formik";
 import { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import logo from "public/images/Flaw-logo-notext.png";
-import { useContext } from "react";
+import { FC, useContext, useEffect } from "react";
 
 import {
   Button,
@@ -17,7 +17,7 @@ import {
   Segment,
 } from "semantic-ui-react";
 import CheckboxField from "src/components/form/CheckboxField";
-import InputField from "src/components/form/InputField";
+import InputField, { inputFieldProps } from "src/components/form/InputField";
 import { REGISTER } from "src/graphql/Auth.graphql";
 import {
   register,
@@ -39,6 +39,39 @@ const registerSchema = object({
 });
 
 type Values = InferType<typeof registerSchema>;
+
+interface validationErrors {
+  target: object;
+  value: string;
+  children: [];
+  property: string;
+  constraints: object;
+}
+
+function parseErrors(errors: validationErrors[]): object {
+  return errors.reduce(
+    (previous, current) => ({
+      ...previous,
+      [current.property]: Object.values(current.constraints).join(", "),
+    }),
+    {}
+  );
+}
+
+const EmailField: FC<inputFieldProps> = (props) => {
+  const { values, setFieldValue } = useFormikContext();
+
+  useEffect(() => {
+    if (values["email"].split("@")[1] === "flaw.uniba.sk") {
+      setFieldValue(
+        "organisation",
+        "Univerzita Komenského v Bratislave, Právnická fakulta"
+      );
+    }
+  }, [values, setFieldValue]);
+
+  return <InputField {...props} />;
+};
 
 const Register: NextPage = () => {
   const { dispatch } = useContext(AuthContext);
@@ -90,11 +123,25 @@ const Register: NextPage = () => {
               terms: false,
             }}
             validationSchema={registerSchema}
-            onSubmit={(values, actions) => {
+            onSubmit={async (values, actions) => {
               try {
-                register({ variables: { data: { ...values } } });
-              } catch (error) {
-                console.log(error);
+                await register({
+                  variables: {
+                    data: {
+                      email: values.email,
+                      name: values.name,
+                      organisation: values.organisation,
+                      telephone: values.telephone,
+                      password: values.password,
+                    },
+                  },
+                });
+              } catch (err) {
+                actions.setStatus(
+                  parseErrors(
+                    err.graphQLErrors[0].extensions.exception.validationErrors
+                  )
+                );
               }
             }}
           >
@@ -111,7 +158,7 @@ const Register: NextPage = () => {
                     control={Input}
                   />
 
-                  <InputField
+                  <EmailField
                     fluid
                     icon="at"
                     iconPosition="left"

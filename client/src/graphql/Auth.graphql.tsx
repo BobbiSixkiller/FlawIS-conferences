@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { RegisterInput } from "__generated__/globalTypes";
 
 export const LOGIN = gql`
   mutation login($email: String!, $password: String!) {
