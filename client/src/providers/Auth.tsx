@@ -1,9 +1,9 @@
 import { createContext, Dispatch, ReactNode, useReducer } from "react";
 import { useQuery } from "@apollo/client";
-import { ME } from "src/graphql/Auth.graphql";
 import { me } from "src/graphql/__generated__/me";
 import { login_login } from "src/graphql/__generated__/login";
 import { Loader } from "semantic-ui-react";
+import { ME } from "src/graphql/Auth.graphql";
 
 type ActionMap<M extends { [index: string]: any }> = {
   [Key in keyof M]: M[Key] extends undefined

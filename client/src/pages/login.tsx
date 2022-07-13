@@ -18,9 +18,10 @@ import {
 } from "semantic-ui-react";
 import { Formik, FormikProps } from "formik";
 import { InferType, object, string } from "yup";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 
 const loginSchema = object({
   email: string().email().required(),
@@ -31,9 +32,15 @@ type Values = InferType<typeof loginSchema>;
 
 const Login: NextPage = () => {
   const { dispatch } = useContext(AuthContext);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
   const [login] = useMutation<login, loginVariables>(LOGIN, {
-    onCompleted: ({ login }) =>
-      dispatch({ type: ActionTypes.Login, payload: { user: login } }),
+    onCompleted: ({ login }) => {
+      dispatch({ type: ActionTypes.Login, payload: { user: login } });
+      router.push("/");
+    },
+    onError: (err) => setError(err.message),
   });
 
   return (
@@ -71,25 +78,16 @@ const Login: NextPage = () => {
             }}
             validationSchema={loginSchema}
             onSubmit={async (values, actions) => {
-              try {
-                await login({ variables: values });
-              } catch (error) {
-                actions.setStatus(error);
-              }
+              await login({ variables: values });
             }}
           >
-            {({
-              handleSubmit,
-              isSubmitting,
-              status,
-              setStatus,
-            }: FormikProps<Values>) => (
+            {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
               <>
-                {status && (
+                {error && (
                   <Message
                     error
-                    content={status.message}
-                    onDismiss={() => setStatus(null)}
+                    content={error}
+                    onDismiss={() => setError("")}
                   />
                 )}
                 <Form size="large" onSubmit={handleSubmit}>

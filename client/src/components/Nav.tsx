@@ -10,7 +10,7 @@ import {
   Header,
   Button,
 } from "semantic-ui-react";
-import { useContext, useState } from "react";
+import { FC, useContext, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -18,11 +18,15 @@ import logoInverted from "public/images/Flaw-logo-notext-inverted.png";
 import logo from "public/images/Flaw-logo-notext.png";
 
 import useWidth from "src/hooks/useWidth";
-import { AuthContext } from "src/providers/Auth";
+import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { Role } from "__generated__/globalTypes";
+import { useRouter } from "next/router";
+import { useMutation } from "@apollo/client";
+import { LOG_OUT } from "src/graphql/Auth.graphql";
 
 interface navProps {
   inView: boolean;
+  homePage: boolean;
   width: number;
 }
 
@@ -32,15 +36,20 @@ const FollowingBar = styled.div<navProps>`
   top: 0px;
   left: 0%;
   padding: ${(props) =>
-    props.inView && props.width > 992 ? "2em 0em" : "0em 0em"};
-  background-color: ${(props) => (props.inView ? "transparent" : "#FFFFFF")};
+    props.inView && props.width > 992 && props.homePage
+      ? "2em 0em"
+      : "0em 0em"};
+  background-color: ${(props) =>
+    props.inView && props.homePage ? "transparent" : "#FFFFFF"};
   width: 100%;
   box-shadow: ${(props) =>
     props.inView
       ? "0px 0px 0px 0px transparent"
       : "0px 3px 5px rgba(0, 0, 0, 0.2)"};
   border-bottom: ${(props) =>
-    props.inView ? "1px solid transparent" : "1px solid #DDDDDD"};
+    props.inView && props.homePage
+      ? "1px solid transparent"
+      : "1px solid #DDDDDD"};
   transition: padding 0.5s ease, background 0.5s ease, box-shadow 0.5s ease,
     border 0.5s ease;
 `;
@@ -83,13 +92,80 @@ const MastHead = styled.div`
   }
 `;
 
+const UserMenu: FC<{ navMenuVisible: boolean }> = ({ navMenuVisible }) => {
+  const { user, dispatch } = useContext(AuthContext);
+  const [visible, toggle] = useState(navMenuVisible);
+
+  const router = useRouter();
+
+  const [logout] = useMutation(LOG_OUT, {
+    onCompleted: () => {
+      toggle(false);
+      dispatch({ type: ActionTypes.Logout });
+      router.push("/");
+    },
+  });
+
+  if (user) {
+    return (
+      <>
+        {user.role === Role.Admin && (
+          <Link href="/new">
+            <Menu.Item as="a">
+              <Icon name="plus" />
+              New Conference
+            </Menu.Item>
+          </Link>
+        )}
+        <Menu.Item as="a" onClick={() => toggle(!visible)}>
+          <Icon name={visible ? "angle up" : "angle down"} />
+          {user.name}
+          {visible && (
+            <>
+              <Link href="/user/profile">
+                <Menu.Item style={{ marginTop: "10px" }} as="a">
+                  <Icon name="user circle" />
+                  Profile
+                </Menu.Item>
+              </Link>
+
+              <Menu.Item as="a" onClick={() => logout()}>
+                <Icon name="sign-out" />
+                Log Out
+              </Menu.Item>
+            </>
+          )}
+        </Menu.Item>
+      </>
+    );
+  } else {
+    return (
+      <>
+        <Link href="/register" passHref>
+          <Menu.Item as="a">
+            <Icon name="signup" />
+            Sign Up
+          </Menu.Item>
+        </Link>
+
+        <Link href="/login" passHref>
+          <Menu.Item as="a">
+            <Icon name="sign-in" />
+            Log In
+          </Menu.Item>
+        </Link>
+      </>
+    );
+  }
+};
+
 export default function Nav({ children }) {
   const { ref, inView } = useInView({ threshold: 1, initialInView: true });
   const [opened, toggle] = useState(false);
 
   const width = useWidth();
 
-  const { user } = useContext(AuthContext);
+  const { asPath } = useRouter();
 
   return (
     <Sidebar.Pushable>
@@ -108,55 +184,25 @@ export default function Nav({ children }) {
         }}
       >
         <Link href="/">
-          <Menu.Item as="a" active>
+          <Menu.Item as="a" active={asPath === "/"}>
             <Icon name="home" />
             Home
           </Menu.Item>
         </Link>
 
-        {user && user.role === Role.Admin && (
-          <Link href="/new">
-            <Menu.Item as="a">
-              <Icon name="plus" />
-              New Conference
-            </Menu.Item>
-          </Link>
-        )}
-
-        {user ? (
-          <Menu.Item as="a">
-            <Icon name="sign-out" />
-            Log Out
-          </Menu.Item>
-        ) : (
-          <>
-            <Link href="/register" passHref>
-              <Menu.Item as="a">
-                <Icon name="signup" />
-                Sign Up
-              </Menu.Item>
-            </Link>
-
-            <Link href="/login" passHref>
-              <Menu.Item as="a">
-                <Icon name="sign-in" />
-                Log In
-              </Menu.Item>
-            </Link>
-          </>
-        )}
+        <UserMenu navMenuVisible={opened} />
       </Sidebar>
 
       <Sidebar.Pusher dimmed={opened}>
         <div ref={ref}>
-          <FollowingBar inView={inView} width={width}>
+          <FollowingBar inView={inView} width={width} homePage={asPath === "/"}>
             <Container>
               <Menu
                 style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
                 }}
-                inverted={inView ? true : false}
+                inverted={inView && asPath === "/" ? true : false}
                 secondary
                 size="large"
               >
@@ -164,7 +210,7 @@ export default function Nav({ children }) {
                   <Menu.Item>
                     <Image
                       alt="flaw-logo-notext"
-                      src={inView ? logoInverted : logo}
+                      src={inView && asPath === "/" ? logoInverted : logo}
                       height={35}
                       width={35}
                       priority={true}
@@ -211,40 +257,42 @@ export default function Nav({ children }) {
           </FollowingBar>
         </div>
 
-        <MastHead>
-          <Container
-            text
-            textAlign="center"
-            style={{
-              minHeight: "350px",
-              height: "auto",
-              margin: width > 800 ? 0 : "50px",
-              padding: width > 600 ? "15rem 0rem" : "6rem 0rem",
-            }}
-          >
-            <Label color="black">2.0.0</Label>
-            <Header
-              as="h1"
-              content="Conferences"
-              inverted
-              style={{ fontSize: width > 992 ? "4em" : "2em" }}
-            />
-            <Header
-              as="h2"
-              content="Faculty of Law, Comenius university in Bratislava"
-              inverted
+        {asPath === "/" && (
+          <MastHead>
+            <Container
+              text
+              textAlign="center"
               style={{
-                fontSize: width > 992 ? "1.7em" : "1.5em",
-                fontWeight: "normal",
+                minHeight: "350px",
+                height: "auto",
+                margin: width > 800 ? 0 : "50px",
+                padding: width > 600 ? "15rem 0rem" : "6rem 0rem",
               }}
-            />
-            <Link href="/login">
-              <Button inverted size="huge">
-                Log In
-              </Button>
-            </Link>
-          </Container>
-        </MastHead>
+            >
+              <Label color="black">2.0.0</Label>
+              <Header
+                as="h1"
+                content="Conferences"
+                inverted
+                style={{ fontSize: width > 992 ? "4em" : "2em" }}
+              />
+              <Header
+                as="h2"
+                content="Faculty of Law, Comenius university in Bratislava"
+                inverted
+                style={{
+                  fontSize: width > 992 ? "1.7em" : "1.5em",
+                  fontWeight: "normal",
+                }}
+              />
+              <Link href="/login">
+                <Button inverted size="huge">
+                  Log In
+                </Button>
+              </Link>
+            </Container>
+          </MastHead>
+        )}
 
         {children}
       </Sidebar.Pusher>

@@ -80,3 +80,9 @@ export const REGISTER = gql`
     }
   }
 `;
+
+export const LOG_OUT = gql`
+  mutation logout {
+    logout
+  }
+`;
