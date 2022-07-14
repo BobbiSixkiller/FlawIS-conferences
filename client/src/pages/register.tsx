@@ -18,6 +18,7 @@ import {
 } from "semantic-ui-react";
 import CheckboxField from "src/components/form/CheckboxField";
 import InputField, { inputFieldProps } from "src/components/form/InputField";
+import parseErrors from "src/components/form/parseErrors";
 import { REGISTER } from "src/graphql/Auth.graphql";
 import {
   register,
@@ -39,24 +40,6 @@ const registerSchema = object({
 });
 
 type Values = InferType<typeof registerSchema>;
-
-interface validationErrors {
-  target: object;
-  value: string;
-  children: [];
-  property: string;
-  constraints: object;
-}
-
-function parseErrors(errors: validationErrors[]): object {
-  return errors.reduce(
-    (previous, current) => ({
-      ...previous,
-      [current.property]: Object.values(current.constraints).join(", "),
-    }),
-    {}
-  );
-}
 
 const EmailField: FC<inputFieldProps> = (props) => {
   const { values, setFieldValue } = useFormikContext();

@@ -10,7 +10,7 @@ import {
   Header,
   Button,
 } from "semantic-ui-react";
-import { FC, useContext, useState } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -92,9 +92,13 @@ const MastHead = styled.div`
   }
 `;
 
-const UserMenu: FC<{ navMenuVisible: boolean }> = ({ navMenuVisible }) => {
+export default function Nav({ children }) {
+  const { ref, inView } = useInView({ threshold: 1, initialInView: true });
+  const [opened, toggle] = useState(false);
+
   const { user, dispatch } = useContext(AuthContext);
-  const [visible, toggle] = useState(navMenuVisible);
+
+  const width = useWidth();
 
   const router = useRouter();
 
@@ -102,70 +106,12 @@ const UserMenu: FC<{ navMenuVisible: boolean }> = ({ navMenuVisible }) => {
     onCompleted: () => {
       toggle(false);
       dispatch({ type: ActionTypes.Logout });
-      router.push("/");
     },
   });
 
-  if (user) {
-    return (
-      <>
-        {user.role === Role.Admin && (
-          <Link href="/new">
-            <Menu.Item as="a">
-              <Icon name="plus" />
-              New Conference
-            </Menu.Item>
-          </Link>
-        )}
-        <Menu.Item as="a" onClick={() => toggle(!visible)}>
-          <Icon name={visible ? "angle up" : "angle down"} />
-          {user.name}
-          {visible && (
-            <>
-              <Link href="/user/profile">
-                <Menu.Item style={{ marginTop: "10px" }} as="a">
-                  <Icon name="user circle" />
-                  Profile
-                </Menu.Item>
-              </Link>
-
-              <Menu.Item as="a" onClick={() => logout()}>
-                <Icon name="sign-out" />
-                Log Out
-              </Menu.Item>
-            </>
-          )}
-        </Menu.Item>
-      </>
-    );
-  } else {
-    return (
-      <>
-        <Link href="/register" passHref>
-          <Menu.Item as="a">
-            <Icon name="signup" />
-            Sign Up
-          </Menu.Item>
-        </Link>
-
-        <Link href="/login" passHref>
-          <Menu.Item as="a">
-            <Icon name="sign-in" />
-            Log In
-          </Menu.Item>
-        </Link>
-      </>
-    );
-  }
-};
-
-export default function Nav({ children }) {
-  const { ref, inView } = useInView({ threshold: 1, initialInView: true });
-  const [opened, toggle] = useState(false);
-
-  const width = useWidth();
-
-  const { asPath } = useRouter();
+  useEffect(() => {
+    toggle(false);
+  }, [router.asPath]);
 
   return (
     <Sidebar.Pushable>
@@ -184,38 +130,76 @@ export default function Nav({ children }) {
         }}
       >
         <Link href="/">
-          <Menu.Item as="a" active={asPath === "/"}>
+          <Menu.Item as="a" active={router.asPath === "/"}>
             <Icon name="home" />
-            Home
+            <b>Home</b>
           </Menu.Item>
         </Link>
-
-        <UserMenu navMenuVisible={opened} />
+        <Menu.Item>
+          <Menu.Header>{user ? user.name : "User"}</Menu.Header>
+          {user ? (
+            <Menu vertical inverted>
+              <Link href="/user/profile">
+                <Menu.Item as="a" name="Profile" />
+              </Link>
+              <Link href="/">
+                <Menu.Item as="a" name="Sign out" onClick={() => logout()} />
+              </Link>
+            </Menu>
+          ) : (
+            <Menu vertical inverted>
+              <Link href="/login">
+                <Menu.Item as="a" name="log in" />
+              </Link>
+              <Link href="register">
+                <Menu.Item as="a" name="register" />
+              </Link>
+            </Menu>
+          )}
+        </Menu.Item>
+        {user && user.role === Role.Admin && (
+          <Menu.Item>
+            <Menu.Header>Admin</Menu.Header>
+            <Menu vertical inverted>
+              <Link href="/new">
+                <Menu.Item as="a" name="new conference" />
+              </Link>
+            </Menu>
+          </Menu.Item>
+        )}
       </Sidebar>
 
       <Sidebar.Pusher dimmed={opened}>
         <div ref={ref}>
-          <FollowingBar inView={inView} width={width} homePage={asPath === "/"}>
+          <FollowingBar
+            inView={inView}
+            width={width}
+            homePage={router.asPath === "/"}
+          >
             <Container>
               <Menu
                 style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
                 }}
-                inverted={inView && asPath === "/" ? true : false}
+                inverted={inView && router.asPath === "/" ? true : false}
                 secondary
                 size="large"
               >
                 {width > 550 && (
-                  <Menu.Item>
-                    <Image
-                      alt="flaw-logo-notext"
-                      src={inView && asPath === "/" ? logoInverted : logo}
-                      height={35}
-                      width={35}
-                      priority={true}
-                    />
-                  </Menu.Item>
+                  <Link href="/">
+                    <Menu.Item>
+                      <Image
+                        alt="flaw-logo-notext"
+                        src={
+                          inView && router.asPath === "/" ? logoInverted : logo
+                        }
+                        height={35}
+                        width={35}
+                        priority={true}
+                      />
+                    </Menu.Item>
+                  </Link>
                 )}
                 <Menu.Item
                   style={{ marginLeft: 0, marginRight: 0 }}
@@ -225,15 +209,19 @@ export default function Nav({ children }) {
                 </Menu.Item>
 
                 {width < 550 && (
-                  <Menu.Item style={{ marginLeft: "auto", marginRight: 0 }}>
-                    <Image
-                      alt="flaw-logo-notext"
-                      src={inView ? logoInverted : logo}
-                      height={35}
-                      width={35}
-                      priority={true}
-                    />
-                  </Menu.Item>
+                  <Link href="/">
+                    <Menu.Item style={{ marginLeft: "auto", marginRight: 0 }}>
+                      <Image
+                        alt="flaw-logo-notext"
+                        src={
+                          inView && router.asPath === "/" ? logoInverted : logo
+                        }
+                        height={35}
+                        width={35}
+                        priority={true}
+                      />
+                    </Menu.Item>
+                  </Link>
                 )}
                 <Menu.Menu position="right">
                   <Dropdown
@@ -257,7 +245,7 @@ export default function Nav({ children }) {
           </FollowingBar>
         </div>
 
-        {asPath === "/" && (
+        {router.asPath === "/" && (
           <MastHead>
             <Container
               text
