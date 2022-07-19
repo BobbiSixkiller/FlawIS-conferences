@@ -34,6 +34,8 @@ export interface me_me {
   id: any;
   name: string;
   email: string;
+  organisation: string;
+  telephone: string | null;
   role: Role;
   active: boolean;
   billings: me_me_billings[];

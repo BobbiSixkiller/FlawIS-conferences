@@ -2,12 +2,9 @@ import { NextPage } from "next";
 import { FC, useContext, useState } from "react";
 import { Grid, Menu, Segment } from "semantic-ui-react";
 import Footer from "src/components/Footer";
-import Nav from "src/components/Nav";
+import { ContentWrapper, Nav, PageWrapper } from "src/components/Layout";
+import PersonalInfo from "src/components/PersonalInfo";
 import { AuthContext } from "src/providers/Auth";
-
-const PersonalInfo: FC = () => {
-  return <Segment>PERSONAL</Segment>;
-};
 
 const AttendedConferences: FC = () => {
   return <Segment>ATTENDED CONFERENCES</Segment>;
@@ -18,10 +15,10 @@ const ProfilePage: NextPage = () => {
   const [tab, setTab] = useState("personal");
 
   return (
-    <Grid style={{ marginTop: "60px" }} columns={2} container stackable>
+    <Grid columns={2} container stackable>
       <Grid.Row stretched>
         <Grid.Column width={4}>
-          <Menu fluid vertical>
+          <Menu fluid vertical style={{ flexGrow: 0 }}>
             <Menu.Item header>{user.name}</Menu.Item>
             <Menu.Item
               as="a"
@@ -49,16 +46,10 @@ const ProfilePage: NextPage = () => {
 ProfilePage.getLayout = function getLayout(page) {
   return (
     <Nav>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "100vh",
-        }}
-      >
-        <div style={{ flex: 1 }}>{page}</div>
+      <PageWrapper>
+        <ContentWrapper>{page}</ContentWrapper>
         <Footer />
-      </div>
+      </PageWrapper>
     </Nav>
   );
 };

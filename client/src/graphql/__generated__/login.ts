@@ -36,6 +36,8 @@ export interface login_login {
   email: string;
   role: Role;
   active: boolean;
+  organisation: string;
+  telephone: string | null;
   billings: login_login_billings[];
 }
 

@@ -34,6 +34,8 @@ export interface register_register {
   id: any;
   name: string;
   email: string;
+  organisation: string;
+  telephone: string | null;
   role: Role;
   active: boolean;
   billings: register_register_billings[];

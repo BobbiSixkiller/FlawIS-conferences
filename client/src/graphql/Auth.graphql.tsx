@@ -8,6 +8,8 @@ export const LOGIN = gql`
       email
       role
       active
+      organisation
+      telephone
       billings {
         id
         name
@@ -33,6 +35,8 @@ export const ME = gql`
       id
       name
       email
+      organisation
+      telephone
       role
       active
       billings {
@@ -60,6 +64,8 @@ export const REGISTER = gql`
       id
       name
       email
+      organisation
+      telephone
       role
       active
       billings {
