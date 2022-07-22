@@ -1,9 +1,16 @@
-import { Formik } from "formik";
+import { useMutation } from "@apollo/client";
+import { Formik, FormikProps } from "formik";
 import { FC, useContext, useState } from "react";
 import { Button, Form, Grid, Input, Segment } from "semantic-ui-react";
-import { AuthContext } from "src/providers/Auth";
+import { UPDATE_USER } from "src/graphql/User.graphql";
+import {
+  updateUser,
+  updateUserVariables,
+} from "src/graphql/__generated__/updateUser";
+import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { InferType, object, string } from "yup";
 import InputField from "./form/InputField";
+import parseErrors from "./form/parseErrors";
 
 const perosnalInfoSchema = object({
   name: string().required(),
@@ -18,6 +25,16 @@ const PersonalInfo: FC = () => {
   const [update, setUpdate] = useState(false);
   const { user, dispatch } = useContext(AuthContext);
 
+  const [updateUser] = useMutation<updateUser, updateUserVariables>(
+    UPDATE_USER,
+    {
+      onCompleted: ({ updateUser }) => {
+        dispatch({ type: ActionTypes.Login, payload: { user: updateUser } });
+        setUpdate(false);
+      },
+    }
+  );
+
   return (
     <Grid>
       <Grid.Column mobile={16} tablet={12} computer={8}>
@@ -29,9 +46,29 @@ const PersonalInfo: FC = () => {
             telephone: user.telephone,
           }}
           validationSchema={perosnalInfoSchema}
-          onSubmit={(values, actions) => console.log(values)}
+          onSubmit={async (values, actions) => {
+            try {
+              await updateUser({
+                variables: {
+                  id: user.id,
+                  data: {
+                    email: values.email,
+                    name: values.name,
+                    organisation: values.organisation,
+                    telephone: values.telephone,
+                  },
+                },
+              });
+            } catch (err) {
+              actions.setStatus(
+                parseErrors(
+                  err.graphQLErrors[0].extensions.exception.validationErrors
+                )
+              );
+            }
+          }}
         >
-          {({ handleSubmit, isSubmitting, resetForm }) => (
+          {({ handleSubmit, isSubmitting, resetForm }: FormikProps<Values>) => (
             <Form onSubmit={handleSubmit}>
               <Segment>
                 <InputField

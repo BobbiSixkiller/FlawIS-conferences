@@ -26,6 +26,16 @@ export interface RegisterInput {
   telephone: string;
 }
 
+/**
+ * User update input data
+ */
+export interface UserInput {
+  name: string;
+  email: string;
+  organisation: string;
+  telephone: string;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

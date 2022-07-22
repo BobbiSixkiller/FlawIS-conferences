@@ -1,4 +1,4 @@
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import { Container, Dropdown, Menu, Icon, Sidebar } from "semantic-ui-react";
 import { useContext, useEffect, useState } from "react";

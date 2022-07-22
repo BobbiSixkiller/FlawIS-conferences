@@ -43,7 +43,7 @@ function authReducer(state: AuthContextType, action: AuthActions) {
 
 interface AuthContextType {
   loading: boolean;
-  user: login_login | null;
+  user: Partial<login_login> | null;
   dispatch: Dispatch<AuthActions>;
 }
 

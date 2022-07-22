@@ -1,17 +1,17 @@
 import { UserInputError } from "apollo-server";
 import { ObjectId } from "mongodb";
 import {
-	Arg,
-	Args,
-	Authorized,
-	Ctx,
-	Field,
-	FieldResolver,
-	Int,
-	Mutation,
-	Query,
-	Resolver,
-	Root,
+  Arg,
+  Args,
+  Authorized,
+  Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+  Root,
 } from "type-graphql";
 import { Service } from "typedi";
 import { Attendee, AttendeeConnection } from "../entitites/Attendee";
@@ -28,146 +28,144 @@ import { ConferenceInput } from "./types/conference";
 @Service()
 @Resolver(() => Conference)
 export class ConferenceResolver {
-	constructor(
-		private readonly conferenceService = new CRUDservice(Conference),
-		private readonly sectionService = new CRUDservice(Section),
-		private readonly attendeeService = new CRUDservice(Attendee)
-	) {}
+  constructor(
+    private readonly conferenceService = new CRUDservice(Conference),
+    private readonly sectionService = new CRUDservice(Section),
+    private readonly attendeeService = new CRUDservice(Attendee)
+  ) {}
 
-	@Query(() => Conference)
-	async conference(
-		@Arg("id", () => ObjectIdScalar) id: ObjectId
-	): Promise<Conference> {
-		const conference = await this.conferenceService.findOne({ _id: id });
-		if (!conference) throw new UserInputError("Conference not found!");
+  @Query(() => Conference)
+  async conference(@Arg("slug") slug: string): Promise<Conference> {
+    const conference = await this.conferenceService.findOne({ slug });
+    if (!conference) throw new UserInputError("Conference not found!");
 
-		return conference;
-	}
+    return conference;
+  }
 
-	@Query(() => [Conference])
-	async conferences(): Promise<Conference[]> {
-		return await this.conferenceService.findAll({});
-	}
+  @Query(() => [Conference])
+  async conferences(): Promise<Conference[]> {
+    return await this.conferenceService.findAll({});
+  }
 
-	@Query(() => [Conference])
-	async upcomingConferences(): Promise<Conference[]> {
-		return await this.conferenceService.findAll({
-			regStart: { $gt: Date.now() },
-		});
-	}
+  @Query(() => [Conference])
+  async upcomingConferences(): Promise<Conference[]> {
+    return await this.conferenceService.findAll({
+      regStart: { $gt: Date.now() },
+    });
+  }
 
-	@Authorized(["ADMIN"])
-	@Mutation(() => Conference)
-	async createConference(
-		@Arg("data") conferenceInput: ConferenceInput,
-		@Ctx() { locale }: Context
-	): Promise<Conference> {
-		return await this.conferenceService.create(
-			localizeInput(conferenceInput, conferenceInput.translations, locale)
-		);
-	}
+  @Authorized(["ADMIN"])
+  @Mutation(() => Conference)
+  async createConference(
+    @Arg("data") conferenceInput: ConferenceInput,
+    @Ctx() { locale }: Context
+  ): Promise<Conference> {
+    return await this.conferenceService.create(
+      localizeInput(conferenceInput, conferenceInput.translations, locale)
+    );
+  }
 
-	@Authorized(["ADMIN"])
-	@Mutation(() => Conference)
-	async updateConference(
-		@Arg("id", () => ObjectIdScalar) id: ObjectId,
-		@Arg("data") conferenceInput: ConferenceInput,
-		@Ctx() { locale }: Context
-	) {
-		const conference = await this.conferenceService.findOne({ _id: id });
-		if (!conference) throw new UserInputError("Conference not found!");
+  @Authorized(["ADMIN"])
+  @Mutation(() => Conference)
+  async updateConference(
+    @Arg("id", () => ObjectIdScalar) id: ObjectId,
+    @Arg("data") conferenceInput: ConferenceInput,
+    @Ctx() { locale }: Context
+  ) {
+    const conference = await this.conferenceService.findOne({ _id: id });
+    if (!conference) throw new UserInputError("Conference not found!");
 
-		for (const [key, value] of Object.entries(
-			localizeInput(conferenceInput, conferenceInput.translations, locale)
-		)) {
-			conference[key as keyof Conference] = value;
-		}
+    for (const [key, value] of Object.entries(
+      localizeInput(conferenceInput, conferenceInput.translations, locale)
+    )) {
+      conference[key as keyof Conference] = value;
+    }
 
-		return await conference.save();
-	}
+    return await conference.save();
+  }
 
-	@Authorized()
-	@FieldResolver(() => [Section])
-	async sections(@Root() { id }: Conference): Promise<Section[]> {
-		return await this.sectionService.findAll({ conference: id });
-	}
+  @Authorized()
+  @FieldResolver(() => [Section])
+  async sections(@Root() { id }: Conference): Promise<Section[]> {
+    return await this.sectionService.findAll({ conference: id });
+  }
 
-	@Authorized()
-	@FieldResolver(() => AttendeeConnection)
-	async attendees(
-		@Args() { after, first, before, last }: AttendeeArgs,
-		@Root() { id }: Conference,
-		@Ctx() { user }: Context
-	): Promise<AttendeeConnection> {
-		const attendees = await this.attendeeService.aggregate([
-			{
-				$match: {
-					conference: id,
-					$expr: {
-						$cond: [
-							{ $and: [{ $eq: [after, null] }, { $eq: [before, null] }] },
-							{ $ne: ["$_id", null] },
-							{
-								$cond: [
-									{ $ne: [after, null] },
-									{ $lt: ["$_id", after] },
-									{ $gt: ["$_id", before] },
-								],
-							},
-						],
-					},
-				},
-			},
-			{ $sort: { _id: -1 } },
-			{ $limit: first || last || 20 },
-		]);
+  @Authorized()
+  @FieldResolver(() => AttendeeConnection)
+  async attendees(
+    @Args() { after, first, before, last }: AttendeeArgs,
+    @Root() { id }: Conference,
+    @Ctx() { user }: Context
+  ): Promise<AttendeeConnection> {
+    const attendees = await this.attendeeService.aggregate([
+      {
+        $match: {
+          conference: id,
+          $expr: {
+            $cond: [
+              { $and: [{ $eq: [after, null] }, { $eq: [before, null] }] },
+              { $ne: ["$_id", null] },
+              {
+                $cond: [
+                  { $ne: [after, null] },
+                  { $lt: ["$_id", after] },
+                  { $gt: ["$_id", before] },
+                ],
+              },
+            ],
+          },
+        },
+      },
+      { $sort: { _id: -1 } },
+      { $limit: first || last || 20 },
+    ]);
 
-		const [hasNextPage, hasPreviousPage] = await Promise.all([
-			this.attendeeService.exists({
-				_id: { $gt: attendees[0]?._id },
-			}),
-			this.attendeeService.exists({
-				_id: { $lt: attendees[attendees.length - 1]?._id },
-			}),
-		]);
+    const [hasNextPage, hasPreviousPage] = await Promise.all([
+      this.attendeeService.exists({
+        _id: { $gt: attendees[0]?._id },
+      }),
+      this.attendeeService.exists({
+        _id: { $lt: attendees[attendees.length - 1]?._id },
+      }),
+    ]);
 
-		return {
-			edges: attendees.map((attendee) => ({
-				cursor: attendee?._id,
-				node: transformIds(attendee),
-			})),
-			pageInfo: {
-				startCursor: attendees[0]?._id,
-				hasPreviousPage: hasPreviousPage !== null,
-				endCursor: attendees[attendees.length - 1]?._id,
-				hasNextPage: hasNextPage !== null,
-			},
-		};
-	}
+    return {
+      edges: attendees.map((attendee) => ({
+        cursor: attendee?._id,
+        node: transformIds(attendee),
+      })),
+      pageInfo: {
+        startCursor: attendees[0]?._id,
+        hasPreviousPage: hasPreviousPage !== null,
+        endCursor: attendees[attendees.length - 1]?._id,
+        hasNextPage: hasNextPage !== null,
+      },
+    };
+  }
 
-	@Authorized()
-	@FieldResolver(() => Boolean)
-	async attending(
-		@Root() { id }: Conference,
-		@Ctx() { user }: Context
-	): Promise<boolean> {
-		return (
-			(await this.attendeeService.exists({
-				conference: id,
-				"user.id": user!.id,
-			})) !== null
-		);
-	}
+  @Authorized()
+  @FieldResolver(() => Boolean)
+  async attending(
+    @Root() { id }: Conference,
+    @Ctx() { user }: Context
+  ): Promise<boolean> {
+    return (
+      (await this.attendeeService.exists({
+        conference: id,
+        "user.id": user!.id,
+      })) !== null
+    );
+  }
 
-	@Authorized()
-	@FieldResolver(() => Int)
-	async attendeesCount(
-		@Root() { id }: Conference,
-		@Ctx() { user }: Context
-	): Promise<number> {
-		return await this.attendeeService.dataModel.countDocuments({
-			conference: id,
-			"user.id": user!.id,
-		});
-	}
+  @Authorized()
+  @FieldResolver(() => Int)
+  async attendeesCount(
+    @Root() { id }: Conference,
+    @Ctx() { user }: Context
+  ): Promise<number> {
+    return await this.attendeeService.dataModel.countDocuments({
+      conference: id,
+      "user.id": user!.id,
+    });
+  }
 }

@@ -19,19 +19,23 @@ const ProfilePage: NextPage = () => {
       <Grid.Row stretched>
         <Grid.Column width={4}>
           <Menu fluid vertical style={{ flexGrow: 0 }}>
-            <Menu.Item header>{user.name}</Menu.Item>
-            <Menu.Item
-              as="a"
-              name="personal information"
-              active={tab === "personal"}
-              onClick={() => setTab("personal")}
-            />
-            <Menu.Item
-              as="a"
-              name="conferences"
-              active={tab === "conferences"}
-              onClick={() => setTab("conferences")}
-            />
+            <Menu.Item>
+              <Menu.Header>{user.name}</Menu.Header>
+              <Menu.Menu>
+                <Menu.Item
+                  as="a"
+                  name="personal information"
+                  active={tab === "personal"}
+                  onClick={() => setTab("personal")}
+                />
+                <Menu.Item
+                  as="a"
+                  name="conferences"
+                  active={tab === "conferences"}
+                  onClick={() => setTab("conferences")}
+                />
+              </Menu.Menu>
+            </Menu.Item>
           </Menu>
         </Grid.Column>
         <Grid.Column width={12}>

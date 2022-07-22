@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FC, useContext } from "react";
-import { Button, Container, Header, Icon, Label } from "semantic-ui-react";
+import { Button, Container, Header, Label } from "semantic-ui-react";
 import useWith from "src/hooks/useWidth";
 import { AuthContext } from "src/providers/Auth";
 import styled, { keyframes } from "styled-components";

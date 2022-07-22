@@ -91,6 +91,7 @@ type Conference {
   name: String!
   regStart: DateTime
   sections: [Section!]!
+  slug: String!
   start: DateTime
   tickets: [Ticket!]!
   translations: [ConferenceTranslation!]!
@@ -212,7 +213,7 @@ type PageInfo {
 
 type Query {
   attendee(id: ObjectId!): Attendee!
-  conference(id: ObjectId!): Conference!
+  conference(slug: String!): Conference!
   conferences: [Conference!]!
   section(id: ObjectId!): Section!
   submission(id: ObjectId!): Submission!
