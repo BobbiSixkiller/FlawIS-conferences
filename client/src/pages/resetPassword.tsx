@@ -3,20 +3,19 @@ import { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "public/images/Flaw-logo-notext.png";
-import { FC } from "react";
 
 import { Button, Form, Grid, Header, Input, Segment } from "semantic-ui-react";
 import InputField from "src/components/form/InputField";
 import { InferType, object, ref, string } from "yup";
 
-const resetPasswordSchema = object({
+const resetPasswordInputSchema = object({
   password: string().required(),
   repeatPass: string()
     .required()
     .oneOf([ref("password")]),
 });
 
-type Values = InferType<typeof resetPasswordSchema>;
+type Values = InferType<typeof resetPasswordInputSchema>;
 
 const ResetPassword: NextPage = () => {
   return (
@@ -49,7 +48,7 @@ const ResetPassword: NextPage = () => {
           </Header>
           <Formik
             initialValues={{ password: "", repeatPass: "" }}
-            validationSchema={resetPasswordSchema}
+            validationSchema={resetPasswordInputSchema}
             onSubmit={(values, actions) => {
               setTimeout(() => {
                 console.log(values);

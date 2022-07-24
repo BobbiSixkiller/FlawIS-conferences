@@ -214,10 +214,9 @@ type PageInfo {
 type Query {
   attendee(id: ObjectId!): Attendee!
   conference(slug: String!): Conference!
-  conferences: [Conference!]!
+  conferences(year: DateTime!): [Conference!]!
   section(id: ObjectId!): Section!
   submission(id: ObjectId!): Submission!
-  upcomingConferences: [Conference!]!
 }
 
 """Conference's section entity model type"""

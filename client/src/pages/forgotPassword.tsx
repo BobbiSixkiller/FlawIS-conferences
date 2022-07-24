@@ -16,9 +16,11 @@ import {
 import InputField from "src/components/form/InputField";
 import { InferType, object, string } from "yup";
 
-const forgotPasswordSchema = object({ email: string().required().email() });
+const forgotPasswordInputSchema = object({
+  email: string().required().email(),
+});
 
-type Values = InferType<typeof forgotPasswordSchema>;
+type Values = InferType<typeof forgotPasswordInputSchema>;
 
 const ForgotPassword: NextPage = () => {
   return (
@@ -51,7 +53,7 @@ const ForgotPassword: NextPage = () => {
           </Header>
           <Formik
             initialValues={{ email: "" }}
-            validationSchema={forgotPasswordSchema}
+            validationSchema={forgotPasswordInputSchema}
             onSubmit={(values, actions) => {
               setTimeout(() => {
                 console.log(values);

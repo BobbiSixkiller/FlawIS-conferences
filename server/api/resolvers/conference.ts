@@ -43,15 +43,14 @@ export class ConferenceResolver {
   }
 
   @Query(() => [Conference])
-  async conferences(): Promise<Conference[]> {
-    return await this.conferenceService.findAll({});
-  }
-
-  @Query(() => [Conference])
-  async upcomingConferences(): Promise<Conference[]> {
-    return await this.conferenceService.findAll({
-      regStart: { $gt: Date.now() },
-    });
+  async conferences(@Arg("year") year: Date): Promise<Conference[]> {
+    return await this.conferenceService.findAll(
+      {
+        $expr: { $eq: [{ $year: "$start" }, year.getFullYear()] },
+      },
+      {},
+      { sort: { _id: -1 } }
+    );
   }
 
   @Authorized(["ADMIN"])

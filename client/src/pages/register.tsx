@@ -27,7 +27,7 @@ import {
 import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { boolean, InferType, object, ref, string } from "yup";
 
-const registerSchema = object({
+const registerInputSchema = object({
   name: string().required(),
   email: string().required().email(),
   organisation: string().required(),
@@ -39,7 +39,7 @@ const registerSchema = object({
   terms: boolean().oneOf([true], "You must agree with the Privacy policy"),
 });
 
-type Values = InferType<typeof registerSchema>;
+type Values = InferType<typeof registerInputSchema>;
 
 const EmailField: FC<inputFieldProps> = (props) => {
   const { values, setFieldValue } = useFormikContext();
@@ -105,7 +105,7 @@ const Register: NextPage = () => {
               repeatPass: "",
               terms: false,
             }}
-            validationSchema={registerSchema}
+            validationSchema={registerInputSchema}
             onSubmit={async (values, actions) => {
               try {
                 await register({

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import { Container, Dropdown, Menu, Icon, Sidebar } from "semantic-ui-react";
-import { useContext, useEffect, useState } from "react";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -55,7 +55,7 @@ export const ContentWrapper = styled.div`
   margin: 75px 0 2em 0;
 `;
 
-export function Nav({ children }) {
+export function Nav({ children }: { children: ReactElement }) {
   const { ref, inView } = useInView({ threshold: 1, initialInView: true });
   const [opened, toggle] = useState(false);
 

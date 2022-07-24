@@ -23,12 +23,12 @@ import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 
-const loginSchema = object({
+const loginInputSchema = object({
   email: string().email().required(),
   password: string().required(),
 });
 
-type Values = InferType<typeof loginSchema>;
+type Values = InferType<typeof loginInputSchema>;
 
 const Login: NextPage = () => {
   const { dispatch } = useContext(AuthContext);
@@ -76,7 +76,7 @@ const Login: NextPage = () => {
               email: "",
               password: "",
             }}
-            validationSchema={loginSchema}
+            validationSchema={loginInputSchema}
             onSubmit={async (values, actions) => {
               await login({ variables: values });
             }}

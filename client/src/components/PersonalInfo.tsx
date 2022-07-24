@@ -12,14 +12,14 @@ import { InferType, object, string } from "yup";
 import InputField from "./form/InputField";
 import parseErrors from "./form/parseErrors";
 
-const perosnalInfoSchema = object({
+const perosnalInfoInputSchema = object({
   name: string().required(),
   email: string().required().email(),
   organisation: string().required(),
   telephone: string().required(),
 });
 
-type Values = InferType<typeof perosnalInfoSchema>;
+type Values = InferType<typeof perosnalInfoInputSchema>;
 
 const PersonalInfo: FC = () => {
   const [update, setUpdate] = useState(false);
@@ -45,7 +45,7 @@ const PersonalInfo: FC = () => {
             organisation: user.organisation,
             telephone: user.telephone,
           }}
-          validationSchema={perosnalInfoSchema}
+          validationSchema={perosnalInfoInputSchema}
           onSubmit={async (values, actions) => {
             try {
               await updateUser({
